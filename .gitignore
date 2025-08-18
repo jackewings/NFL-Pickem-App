@@ -1,0 +1,9 @@
+# Streamlit secrets (local only)
+.streamlit/
+
+# Data files (picks, results, etc.)
+data/
+
+# Python cache
+__pycache__/
+*.pyc
