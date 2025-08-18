@@ -2,22 +2,17 @@ import streamlit as st
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
+from src import data, scoring, config
 
 # ---------------------------
 # Setup
 # ---------------------------
 DATA_DIR = Path("data")
 DATA_DIR.mkdir(parents=True, exist_ok=True)
-DATA_FILE = DATA_DIR / "picks.csv"
+DATA_FILE = Path(config.DATA_FILE)
 
-CURRENT_WEEK = 1
-PASSWORD = st.secrets.get("app_password", "demo123")  # set real secret later in Streamlit Cloud
-
-# Demo games (we’ll replace with real data later)
-demo_games = [
-    {"Game": "Packers @ Bears", "Spread": -3.0},
-    {"Game": "Patriots @ Jets", "Spread": +7.0},
-]
+CURRENT_WEEK = config.CURRENT_WEEK
+PASSWORD = st.secrets.get("app_password", config.PASSWORD)
 
 # ---------------------------
 # Helpers
@@ -27,27 +22,19 @@ def load_picks():
         return pd.read_csv(DATA_FILE)
     return pd.DataFrame(columns=["Week", "User", "Game", "Spread", "Pick", "Timestamp"])
 
-def save_picks(df):
+def save_picks(df: pd.DataFrame):
     df.to_csv(DATA_FILE, index=False)
-
-def leaderboard(df):
-    if df.empty:
-        return pd.DataFrame(columns=["User", "Total Picks"])
-    return df.groupby("User").size().reset_index(name="Total Picks").sort_values("Total Picks", ascending=False)
 
 # ---------------------------
 # UI
 # ---------------------------
-st.title("NFL Pick'em App (Prototype)")
+st.title("🏈 NFL Pick’em Tracker (ATS)")
+st.caption("For entertainment only — tracks friendly picks, does not place bets or handle money.")
 
-name = st.text_input("Enter your name:")
-if st.button("Say hi"):
-    st.write(f"Hey {name}, welcome to the app!")
-
-mode = st.radio("Choose mode", ["Public Demo", "Live Mode (Password Required)"])
+mode = st.radio("Choose mode:", ["Public Demo", "Live Mode (Password Required)"])
 
 if mode == "Live Mode (Password Required)":
-    pw = st.text_input("Enter password", type="password")
+    pw = st.text_input("Enter password:", type="password")
     if pw != PASSWORD:
         st.warning("❌ Incorrect password")
         st.stop()
@@ -59,8 +46,10 @@ if mode == "Live Mode (Password Required)":
 
     if user:
         st.subheader(f"Week {CURRENT_WEEK} Picks — {user}")
+        weekly_games = data.get_weekly_spreads(CURRENT_WEEK)
         session_picks = []
-        for g in demo_games:
+
+        for g in weekly_games:
             pick = st.radio(
                 f"{g['Game']} | Spread: {g['Spread']}",
                 ["Home covers", "Away covers"],
@@ -81,10 +70,11 @@ if mode == "Live Mode (Password Required)":
             st.success("✅ Picks saved")
 
     st.subheader("🏆 Leaderboard (demo scoring)")
-    st.dataframe(leaderboard(load_picks()), use_container_width=True)
+    st.dataframe(scoring.calculate_scores(picks_df, None), use_container_width=True)
 
 else:
     st.info("Public demo — play with the UI without saving data.")
+    demo_games = data.get_weekly_spreads(CURRENT_WEEK)
     for g in demo_games:
         st.radio(
             f"{g['Game']} | Spread: {g['Spread']}",
@@ -97,4 +87,4 @@ else:
         {"Week": 1, "User": "Bob",   "Game": "Patriots @ Jets", "Spread": +7.0, "Pick": "Away covers", "Timestamp": "2025-08-01 12:05"},
     ])
     st.subheader("🏆 Leaderboard (demo data)")
-    st.dataframe(leaderboard(demo_df), use_container_width=True)
+    st.dataframe(scoring.calculate_scores(demo_df, None), use_container_width=True)
