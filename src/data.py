@@ -2,8 +2,9 @@ import requests
 import csv
 from pathlib import Path
 from datetime import datetime
+import streamlit as st
 
-API_KEY = "0c6a7bf93a88b7cf862bcce2817ab94b"  # replace with your actual key
+API_KEY = st.secrets['API_KEY']  # replace with your actual key
 
 # Example: 2025 NFL season schedule mapping (start_date, end_date) for each week
 # Dates are in UTC, adjust as needed
@@ -86,7 +87,8 @@ def get_weekly_spreads(chosen_bookmaker="DraftKings", save_csv=True):
                 "away_team": away_team,
                 "commence_time": commence_time,
                 "spread": home_spread,
-                "bookmaker": chosen_bookmaker
+                "bookmaker": chosen_bookmaker,
+                "game": f"{away_team} @ {home_team}",   
             })
         except (IndexError, KeyError):
             continue
@@ -96,7 +98,7 @@ def get_weekly_spreads(chosen_bookmaker="DraftKings", save_csv=True):
         Path("data").mkdir(exist_ok=True)
         csv_file = f"data/weekly_spreads.csv"  # All weeks in one CSV
         with open(csv_file, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=["week","home_team","away_team","commence_time","spread","bookmaker"])
+            writer = csv.DictWriter(f, fieldnames=["week","home_team","away_team","commence_time","spread","bookmaker", 'game'])
             writer.writeheader()
             writer.writerows(spreads_list)
         print(f"Saved CSV to {csv_file}")

@@ -4,7 +4,7 @@ import json
 # ---------------------------
 # Replace with your API key
 # ---------------------------
-API_KEY = "0c6a7bf93a88b7cf862bcce2817ab94b"
+API_KEY = st.secrets['API_KEY']
 
 # Endpoint for NFL odds
 url = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds"
