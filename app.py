@@ -37,8 +37,14 @@ def game_has_started(commence_time_str):
     except Exception:
         return False
 
-st.title("🏈 NFL Pick’em Tracker (ATS)")
-st.caption("For entertainment only — tracks friendly picks, does not place bets or handle money.")
+def format_spread(spread):
+    """Format spread with proper + sign for positive values"""
+    if spread > 0:
+        return f"+{spread}"
+    return str(spread)
+
+st.title("🏈 NFL Pick'em Tracker (ATS)")
+st.caption("For entertainment purposes only. Tracks friendly picks, does not involve betting or money.")
 
 # --- Mode selection with session state ---
 if "mode" not in st.session_state:
@@ -56,7 +62,7 @@ else:
 
     # Use the value from session state!
     if st.session_state.mode == "Live Mode (Password Required)":
-    # User selection and authentication
+        # User selection and authentication
         if "user" not in st.session_state:
             st.session_state.user = None
         if "user_authenticated" not in st.session_state:
@@ -82,11 +88,11 @@ else:
                     st.stop()
             st.stop()
 
-        tabs = st.tabs(["Make Picks", "Leaderboards"])
+        # Only shown after successful authentication
+        tabs = st.tabs(["Make Picks", "Past Picks", "Group Picks", "Leaderboards"])
         picks_df = load_picks()
         results_available = RESULTS_FILE.exists() and pd.read_csv(RESULTS_FILE).shape[0] > 0
 
-    # Only shown after successful authentication
         with tabs[0]:
             st.header(f"Week {CURRENT_WEEK} Picks — {user}")
             weekly_games = data.get_weekly_spreads(CURRENT_WEEK)
@@ -138,31 +144,167 @@ else:
                         "pick": pick,
                         "timestamp": datetime.now().isoformat(timespec="seconds")
                     })
-            if st.button("Submit Picks"):
-                unlocked_games = [g["game"] for g in weekly_games if not game_has_started(g.get("commence_time", ""))]
-                picks_df = picks_df[~((picks_df["user"] == user) & (picks_df["week"] == CURRENT_WEEK) & (picks_df["game"].isin(unlocked_games)))]
-                if session_picks:
-                    picks_df = pd.concat([picks_df, pd.DataFrame(session_picks)], ignore_index=True)
-                    save_picks(picks_df)
-                    st.success("Picks submitted!")
+
+            # Submit and Reset buttons side by side
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("Submit Picks"):
+                    unlocked_games = [g["game"] for g in weekly_games if not game_has_started(g.get("commence_time", ""))]
+                    picks_df = picks_df[~((picks_df["user"] == user) & (picks_df["week"] == CURRENT_WEEK) & (picks_df["game"].isin(unlocked_games)))]
+                    if session_picks:
+                        picks_df = pd.concat([picks_df, pd.DataFrame(session_picks)], ignore_index=True)
+                        save_picks(picks_df)
+                        st.success("Picks submitted!")
+
+            with col2:
+                if st.button("Reset Picks"):
+                    st.session_state.show_reset_confirm = True
+
+            # Reset confirmation
+            if st.session_state.get("show_reset_confirm", False):
+                st.warning("⚠️ Are you sure you want to reset all your picks for this week? This cannot be undone.")
+                col1, col2 = st.columns(2)
+                with col1:
+                    if st.button("Yes, Reset"):
+                        unlocked_games = [g["game"] for g in weekly_games if not game_has_started(g.get("commence_time", ""))]
+                        picks_df = picks_df[~((picks_df["user"] == user) & (picks_df["week"] == CURRENT_WEEK) & (picks_df["game"].isin(unlocked_games)))]
+                        save_picks(picks_df)
+                        st.session_state.show_reset_confirm = False
+                        st.success("Picks reset!")
+                        st.rerun()
+                with col2:
+                    if st.button("Cancel"):
+                        st.session_state.show_reset_confirm = False
+                        st.rerun()
 
             st.subheader("Your Picks This Week")
-            st.dataframe(
-                picks_df[(picks_df["user"] == user) & (picks_df["week"] == CURRENT_WEEK)][["game", "spread", "pick"]],
-                use_container_width=True
-            )
-
-            st.subheader("All Picks (Games Started)")
-            started_games = [g["game"] for g in weekly_games if game_has_started(g.get("commence_time", ""))]
-            if started_games:
+            current_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == CURRENT_WEEK)]
+            if not current_picks.empty:
+                # Format spreads with + for positive values
+                current_picks_display = current_picks.copy()
+                current_picks_display["spread"] = current_picks_display["spread"].apply(format_spread)
                 st.dataframe(
-                    picks_df[(picks_df["week"] == CURRENT_WEEK) & (picks_df["game"].isin(started_games))][["user", "game", "pick"]],
+                    current_picks_display[["game", "spread", "pick"]],
                     use_container_width=True
                 )
             else:
-                st.write("No games have started yet.")
+                st.write("No picks submitted yet.")
 
         with tabs[1]:
+            st.header("Past Picks")
+            
+            # Filter controls - only show weeks prior to current week
+            col1, col2 = st.columns(2)
+            with col1:
+                available_weeks = sorted([w for w in picks_df["week"].unique() if w < CURRENT_WEEK]) if not picks_df.empty else []
+                if available_weeks:
+                    selected_week = st.selectbox("Select Week:", available_weeks)
+                else:
+                    st.write("No past weeks available yet.")
+                    selected_week = None
+            
+            with col2:
+                if available_weeks:
+                    available_users = sorted(picks_df["user"].unique()) if not picks_df.empty else USERS
+                    selected_user = st.selectbox("Select User:", available_users, index=available_users.index(user) if user in available_users else 0)
+
+            # Show filtered picks for past weeks only
+            if selected_week and not picks_df.empty:
+                filtered_picks = picks_df[(picks_df["week"] == selected_week) & (picks_df["user"] == selected_user)]
+                if not filtered_picks.empty:
+                    # Format spreads with + for positive values
+                    filtered_picks_display = filtered_picks.copy()
+                    filtered_picks_display["spread"] = filtered_picks_display["spread"].apply(format_spread)
+                    st.dataframe(
+                        filtered_picks_display[["game", "spread", "pick"]],
+                        use_container_width=True
+                    )
+                else:
+                    st.write(f"No picks found for {selected_user} in Week {selected_week}.")
+
+        with tabs[2]:
+            st.header("Group Picks")
+            st.write("View everyone's picks for games that have already started.")
+            
+            # Get current week games and their start status
+            weekly_games = data.get_weekly_spreads(CURRENT_WEEK)
+            current_week_picks = picks_df[picks_df["week"] == CURRENT_WEEK]
+            
+            if weekly_games:
+                for g in weekly_games:
+                    commence_time_str = g.get("commence_time", None)
+                    game_started = game_has_started(commence_time_str) if commence_time_str else False
+                    
+                    if game_started:
+                        # Format the game title with spreads
+                        if "@" in g["game"]:
+                            away_team, home_team = g["game"].split(" @ ")
+                        else:
+                            home_team, away_team = g["game"].split(" vs. ")
+                        
+                        spread = g["spread"]
+                        
+                        # Format spread with proper +/- signs
+                        if spread > 0:
+                            home_spread_text = f"(+{spread})"
+                            away_spread_text = f"(-{spread})"
+                        else:
+                            home_spread_text = f"({spread})"  # Already has negative sign
+                            away_spread_text = f"(+{abs(spread)})"
+                        
+                        # Create formatted game display
+                        formatted_game = f"{away_team} {away_spread_text} @ {home_team} {home_spread_text}"
+                        
+                        st.subheader(f"📊 {formatted_game}")
+                        
+                        # Get all picks for this game
+                        game_picks = current_week_picks[current_week_picks["game"] == g["game"]]
+                        
+                        if not game_picks.empty:
+                            # Format the display nicely
+                            game_picks_display = game_picks[["user", "pick"]].copy()
+                            game_picks_display = game_picks_display.sort_values("user")
+                            
+                            # Display as a nice table
+                            st.dataframe(
+                                game_picks_display.rename(columns={"user": "User", "pick": "Pick"}),
+                                use_container_width=True,
+                                hide_index=True
+                            )
+                        else:
+                            st.write("No picks submitted for this game.")
+                        
+                        st.write("---")  # Separator between games
+                
+                # Show upcoming games (not started yet)
+                upcoming_games = [g for g in weekly_games if not game_has_started(g.get("commence_time", ""))]
+                if upcoming_games:
+                    st.subheader("🔒 Upcoming Games")
+                    st.write("Picks will be revealed when these games start:")
+                    for g in upcoming_games:
+                        # Format upcoming games with spreads too
+                        if "@" in g["game"]:
+                            away_team, home_team = g["game"].split(" @ ")
+                        else:
+                            home_team, away_team = g["game"].split(" vs. ")
+                        
+                        spread = g["spread"]
+                        
+                        # Format spread with proper +/- signs
+                        if spread > 0:
+                            home_spread_text = f"(+{spread})"
+                            away_spread_text = f"(-{spread})"
+                        else:
+                            home_spread_text = f"({spread})"  # Already has negative sign
+                            away_spread_text = f"(+{abs(spread)})"
+                        
+                        # Create formatted game display
+                        formatted_upcoming_game = f"{away_team} {away_spread_text} @ {home_team}"
+                        st.write(f"• {formatted_upcoming_game}")
+            else:
+                st.write("No games available for this week.")
+
+        with tabs[3]:
             st.header("Leaderboards")
             if not results_available:
                 st.info("Leaderboards will be available after results are entered.")
