@@ -5,8 +5,6 @@ from pathlib import Path
 from datetime import datetime
 import streamlit as st
 
-API_KEY = st.secrets['API_KEY']  # replace with your actual key
-
 # Example: 2025 NFL season schedule mapping (start_date, end_date) for each week
 # Dates are in UTC, adjust as needed
 NFL_WEEKS = {
@@ -48,6 +46,7 @@ def get_weekly_spreads_from_api(chosen_bookmaker="DraftKings", save_csv=True):
     Assigns correct NFL week based on commence_time.
     Saves CSV for caching.
     """
+    API_KEY = st.secrets['API_KEY']
     url = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds"
     params = {
         "apiKey": API_KEY,
