@@ -23,9 +23,9 @@ def calculate_scores(picks_df, results_df):
     )
     weekly["correct_pct"] = (weekly["correct"] / weekly["total"] * 100).round(1)
 
-    # Favorite team calculation for total leaderboard
+    # Best team calculation for total leaderboard
     correct_picks = merged[merged["correct"] == 1]
-    favorite_team = (
+    best_team = (
         correct_picks.groupby(["user", "pick"])
         .size()
         .reset_index(name="count")
@@ -41,6 +41,6 @@ def calculate_scores(picks_df, results_df):
         .reset_index()
     )
     total["correct_pct"] = (total["correct"] / total["total"] * 100).round(1)
-    total["favorite_team"] = total["user"].map(favorite_team).fillna("N/A")
+    total["best_team"] = total["user"].map(best_team).fillna("N/A")
 
     return {"weekly": weekly, "total": total}

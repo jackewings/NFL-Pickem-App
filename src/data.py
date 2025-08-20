@@ -1,5 +1,6 @@
 import requests
 import csv
+import pandas as pd
 from pathlib import Path
 from datetime import datetime
 import streamlit as st
@@ -41,7 +42,7 @@ def assign_week(commence_time_str):
             return week
     return None  # if date doesn't match any week
 
-def get_weekly_spreads(chosen_bookmaker="DraftKings", save_csv=True):
+def get_weekly_spreads_from_api(chosen_bookmaker="DraftKings", save_csv=True):
     """
     Fetch NFL spreads from The Odds API for all available games.
     Assigns correct NFL week based on commence_time.
@@ -104,5 +105,36 @@ def get_weekly_spreads(chosen_bookmaker="DraftKings", save_csv=True):
         print(f"Saved CSV to {csv_file}")
 
     return spreads_list
+
+def get_weekly_spreads(week, chosen_bookmaker="DraftKings"):
+    """
+    Loads spreads from CSV and filters by week.
+    If CSV is empty or doesn't exist, fetches from API and saves.
+    Returns a list of dicts for the given week.
+    """
+    csv_file = "data/weekly_spreads.csv"
+    
+    # Try to load from existing CSV
+    try:
+        df = pd.read_csv(csv_file)
+        if not df.empty:
+            week_df = df[df["week"] == week]
+            if not week_df.empty:
+                return week_df.to_dict(orient="records")
+    except (FileNotFoundError, pd.errors.EmptyDataError):
+        pass  # If file doesn't exist or is empty, fall through
+
+    # If no data found, fetch from API
+    print(f"No cached data for week {week}, fetching from API...")
+    spreads_list = get_weekly_spreads_from_api(chosen_bookmaker=chosen_bookmaker)
+    
+    if spreads_list:
+        # Save to CSV and try again
+        df = pd.DataFrame(spreads_list)
+        df.to_csv(csv_file, index=False)
+        week_df = df[df["week"] == week]
+        return week_df.to_dict(orient="records")
+    
+    return []  # Return empty list if no data available
 
 
