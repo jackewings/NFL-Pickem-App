@@ -116,7 +116,7 @@ else:
                     away_spread_text = f"(+{abs(spread)})"
                 
                 # Create formatted game display
-                formatted_game = f"{away_team} {away_spread_text} @ {home_team}"
+                formatted_game = f"{away_team} {away_spread_text} @ {home_team} {home_spread_text}"
                 
                 commence_time_str = g.get("commence_time", None)
                 locked = game_has_started(commence_time_str) if commence_time_str else False
@@ -183,9 +183,12 @@ else:
                 # Format spreads with + for positive values
                 current_picks_display = current_picks.copy()
                 current_picks_display["spread"] = current_picks_display["spread"].apply(format_spread)
-                st.dataframe(
-                    current_picks_display[["game", "spread", "pick"]],
-                    use_container_width=True
+                st.table(
+                    current_picks_display[["game", "spread", "pick"]].rename(columns={
+                        "game": "Game",
+                        "spread": "Spread", 
+                        "pick": "Pick"
+                    })
                 )
             else:
                 st.write("No picks submitted yet.")
@@ -216,8 +219,13 @@ else:
                     filtered_picks_display = filtered_picks.copy()
                     filtered_picks_display["spread"] = filtered_picks_display["spread"].apply(format_spread)
                     st.dataframe(
-                        filtered_picks_display[["game", "spread", "pick"]],
-                        use_container_width=True
+                        filtered_picks_display[["game", "spread", "pick"]].rename(columns={
+                            "game": "Game",
+                            "spread": "Spread",
+                            "pick": "Pick"
+                        }),
+                        use_container_width=True,
+                        hide_index=True
                     )
                 else:
                     st.write(f"No picks found for {selected_user} in Week {selected_week}.")
@@ -267,7 +275,10 @@ else:
                             
                             # Display as a nice table
                             st.dataframe(
-                                game_picks_display.rename(columns={"user": "User", "pick": "Pick"}),
+                                game_picks_display.rename(columns={
+                                    "user": "User", 
+                                    "pick": "Pick"
+                                }),
                                 use_container_width=True,
                                 hide_index=True
                             )
@@ -299,7 +310,7 @@ else:
                             away_spread_text = f"(+{abs(spread)})"
                         
                         # Create formatted game display
-                        formatted_upcoming_game = f"{away_team} {away_spread_text} @ {home_team}"
+                        formatted_upcoming_game = f"{away_team} {away_spread_text} @ {home_team} {home_spread_text}"
                         st.write(f"• {formatted_upcoming_game}")
             else:
                 st.write("No games available for this week.")
@@ -330,7 +341,8 @@ else:
                         "correct_pct": "Correct Pick %",
                         "Rank": "Rank"
                     })[["Rank", "User", "Week", "Correct Picks", "Correct Pick %"]],
-                    use_container_width=True
+                    use_container_width=True,
+                    hide_index=True
                 )
                 st.subheader("🏆 Season Total Leaderboard")
                 total_ranked = total_ranked.sort_values("Rank")
@@ -344,7 +356,8 @@ else:
                         "best_team": "Best Team",
                         "Rank": "Rank"
                     })[["Rank", "User", "Correct Picks", "Correct Pick %", "Best Team"]],
-                    use_container_width=True
+                    use_container_width=True,
+                    hide_index=True
                 )
 
     else:
@@ -405,7 +418,8 @@ else:
                     "correct_pct": "Correct Pick %",
                     "Rank": "Rank"
                 })[["Rank", "User", "Week", "Correct Picks", "Correct Pick %"]],
-                use_container_width=True
+                use_container_width=True,
+                hide_index=True
             )
             st.subheader("🏆 Season Total Leaderboard (Demo)")
             demo_total_ranked = demo_total_ranked.sort_values("Rank")
@@ -419,5 +433,6 @@ else:
                     "best_team": "Best Team",
                     "Rank": "Rank"
                 })[["Rank", "User", "Correct Picks", "Correct Pick %", "Best Team"]],
-                use_container_width=True
+                use_container_width=True,
+                hide_index=True
             )
