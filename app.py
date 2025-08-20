@@ -115,7 +115,7 @@ else:
                     away_spread_text = f"(+{abs(spread)})"
                 
                 # Create formatted game display
-                formatted_game = f"{away_team} {away_spread_text} @ {home_team} {home_spread_text}"
+                formatted_game = f"{away_team} {away_spread_text} @ {home_team}"
                 
                 commence_time_str = g.get("commence_time", None)
                 locked = game_has_started(commence_time_str) if commence_time_str else False
@@ -179,13 +179,42 @@ else:
             st.subheader("Your Picks This Week")
             current_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == CURRENT_WEEK)]
             if not current_picks.empty:
-                # Format spreads with + for positive values
+                # Create display dataframe with formatted game names and team picks
                 current_picks_display = current_picks.copy()
-                current_picks_display["spread"] = current_picks_display["spread"].apply(format_spread)
+                
+                # Format the game names with spreads for display
+                formatted_games = []
+                for _, row in current_picks_display.iterrows():
+                    # Find the corresponding game data to get spread info
+                    game_data = next((g for g in weekly_games if g["game"] == row["game"]), None)
+                    if game_data:
+                        # Parse teams and format with spread
+                        if "@" in game_data["game"]:
+                            away_team, home_team = game_data["game"].split(" @ ")
+                        else:
+                            home_team, away_team = game_data["game"].split(" vs. ")
+                        
+                        spread = game_data["spread"]
+                        
+                        # Format spread with proper +/- signs
+                        if spread > 0:
+                            home_spread_text = f"(+{spread})"
+                            away_spread_text = f"(-{spread})"
+                        else:
+                            home_spread_text = f"({spread})"  # Already has negative sign
+                            away_spread_text = f"(+{abs(spread)})"
+                        
+                        # Create formatted game display
+                        formatted_game = f"{away_team} {away_spread_text} @ {home_team}"
+                        formatted_games.append(formatted_game)
+                    else:
+                        formatted_games.append(row["game"])  # Fallback to original if no match
+                
+                current_picks_display["formatted_game"] = formatted_games
+                
                 st.table(
-                    current_picks_display[["game", "spread", "pick"]].rename(columns={
-                        "game": "Game",
-                        "spread": "Spread", 
+                    current_picks_display[["formatted_game", "pick"]].rename(columns={
+                        "formatted_game": "Game",
                         "pick": "Pick"
                     })
                 )
