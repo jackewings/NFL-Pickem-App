@@ -42,7 +42,7 @@ def format_spread(spread):
         return f"+{spread}"
     return str(spread)
 
-st.title("🏈 NFL Pick'em Tracker (ATS)")
+st.title("🏈 NFL Pick'em Tracker")
 st.caption("For entertainment purposes only. Tracks friendly picks, does not involve betting or money.")
 
 # --- Mode selection with session state ---
@@ -345,48 +345,60 @@ else:
 
         with tabs[3]:
             st.header("Leaderboards")
-            if not results_available:
-                st.info("Leaderboards will be available after results are entered.")
-            else:
+            
+            # Always show weekly leaderboard structure
+            st.subheader("🏆 Weekly Leaderboard")
+            empty_weekly = pd.DataFrame(columns=["Rank", "User", "Week", "Correct Picks", "Correct Pick %"])
+            st.table(empty_weekly)
+            
+            # Always show season total structure
+            st.subheader("🏆 Season Total Leaderboard")
+            empty_total = pd.DataFrame(columns=["Rank", "User", "Correct Picks", "Correct Pick %", "Best Team"])
+            st.table(empty_total)
+            
+            if results_available:
+                # Your existing leaderboard code here
                 results_df = pd.read_csv(RESULTS_FILE)
                 scores = scoring.calculate_scores(picks_df, results_df)
+                
+                # Handle weekly leaderboard
                 weekly = scores["weekly"]
+                if not weekly.empty:
+                    week_options = sorted(weekly["week"].unique())
+                    selected_week = st.selectbox("Filter weekly leaderboard by week:", week_options)
+                    
+                    weekly_filtered = weekly[weekly["week"] == selected_week] if selected_week else weekly
+                    weekly_ranked = add_rank(weekly_filtered, ["correct", "correct_pct"])
+                    
+                    st.subheader("🏆 Weekly Leaderboard")
+                    st.table(
+                        weekly_ranked.rename(columns={
+                            "user": "User",
+                            "week": "Week",
+                            "correct": "Correct Picks",
+                            "correct_pct": "Correct Pick %",
+                            "Rank": "Rank"
+                        })[["Rank", "User", "Week", "Correct Picks", "Correct Pick %"]]
+                    )
+                
+                # Handle total leaderboard
                 total = scores["total"]
-                week_options = sorted(weekly["week"].unique()) if not weekly.empty else []
-                selected_week = st.selectbox("Filter weekly leaderboard by week:", week_options) if week_options else None
-                if selected_week:
-                    weekly_filtered = weekly[weekly["week"] == selected_week]
-                else:
-                    weekly_filtered = weekly
-                weekly_ranked = add_rank(weekly_filtered, ["correct", "correct_pct"])
-                total_ranked = add_rank(total, ["correct", "correct_pct"])
-                st.subheader("🏆 Weekly Leaderboard")
-                st.dataframe(
-                    weekly_ranked.rename(columns={
-                        "user": "User",
-                        "week": "Week",
-                        "correct": "Correct Picks",
-                        "correct_pct": "Correct Pick %",
-                        "Rank": "Rank"
-                    })[["Rank", "User", "Week", "Correct Picks", "Correct Pick %"]],
-                    use_container_width=True,
-                    hide_index=True
-                )
-                st.subheader("🏆 Season Total Leaderboard")
-                total_ranked = total_ranked.sort_values("Rank")
-                if "best_team" not in total_ranked.columns:
-                    total_ranked["best_team"] = "N/A"
-                st.dataframe(
-                    total_ranked.rename(columns={
-                        "user": "User",
-                        "correct": "Correct Picks",
-                        "correct_pct": "Correct Pick %",
-                        "best_team": "Best Team",
-                        "Rank": "Rank"
-                    })[["Rank", "User", "Correct Picks", "Correct Pick %", "Best Team"]],
-                    use_container_width=True,
-                    hide_index=True
-                )
+                if not total.empty:
+                    total_ranked = add_rank(total, ["correct", "correct_pct"])
+                    
+                    if "best_team" not in total_ranked.columns:
+                        total_ranked["best_team"] = "N/A"
+                    
+                    st.subheader("🏆 Season Total Leaderboard")
+                    st.table(
+                        total_ranked.sort_values("Rank").rename(columns={
+                            "user": "User",
+                            "correct": "Correct Picks",
+                            "correct_pct": "Correct Pick %",
+                            "best_team": "Best Team",
+                            "Rank": "Rank"
+                        })[["Rank", "User", "Correct Picks", "Correct Pick %", "Best Team"]]
+                    )
 
     else:
         # Demo mode
