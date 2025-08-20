@@ -3,11 +3,60 @@ import pandas as pd
 from pathlib import Path
 from datetime import datetime
 from src import data, scoring, config
+import plotly.graph_objects as go
+
+# Add custom theme colors
+st.markdown("""
+<style>
+    .stButton>button {
+        background-color: #2E5DB5;
+        color: white;
+    }
+    .stProgress .st-bo {
+        background-color: #E31837;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 DATA_FILE = Path(config.DATA_FILE)
 RESULTS_FILE = Path("data/results.csv")
 CURRENT_WEEK = config.CURRENT_WEEK
 USERS = ["Gabe", "Jack", "Jake", "Trapp"]
+
+NFL_TEAM_COLORS = {
+    "Cardinals": "#97233F",
+    "Falcons": "#A71930",
+    "Ravens": "#241773",
+    "Bills": "#00338D",
+    "Panthers": "#0085CA",
+    "Bears": "#0B162A",
+    "Bengals": "#FB4F14",
+    "Browns": "#311D00",
+    "Cowboys": "#003594",
+    "Broncos": "#FB4F14",
+    "Lions": "#0076B6",
+    "Packers": "#203731",
+    "Texans": "#03202F",
+    "Colts": "#002C5F",
+    "Jaguars": "#006778",
+    "Chiefs": "#E31837",
+    "Raiders": "#000000",
+    "Chargers": "#0080C6",
+    "Rams": "#003594",
+    "Dolphins": "#008E97",
+    "Vikings": "#4F2683",
+    "Patriots": "#002244",
+    "Saints": "#D3BC8D",
+    "Giants": "#0B2265",
+    "Jets": "#125740",
+    "Eagles": "#004C54",
+    "Steelers": "#FFB612",
+    "49ers": "#AA0000",
+    "Seahawks": "#002244",
+    "Buccaneers": "#D50A0A",
+    "Titans": "#0C2340",
+    "Commanders": "#773141"
+}
 
 def load_picks():
     if DATA_FILE.exists():
@@ -42,6 +91,56 @@ def format_spread(spread):
         return f"+{spread}"
     return str(spread)
 
+def format_game_with_spread(game, spread):
+    """Format game display with spread in consistent format"""
+    if "@" in game:
+        away_team, home_team = game.split(" @ ")
+    else:
+        home_team, away_team = game.split(" vs. ")
+    
+    # Convert to short names if full names are used
+    away_team = TEAM_NAME_MAPPING.get(away_team, away_team)
+    home_team = TEAM_NAME_MAPPING.get(home_team, home_team)
+    
+    # Format spread with proper +/- signs
+    formatted_spread = format_spread(spread)
+    return f"{away_team} ({formatted_spread}) @ {home_team}"
+
+TEAM_NAME_MAPPING = {
+    "Minnesota Vikings": "Vikings",
+    "Detroit Lions": "Lions",
+    "Green Bay Packers": "Packers",
+    "Chicago Bears": "Bears",
+    "Dallas Cowboys": "Cowboys",
+    "Philadelphia Eagles": "Eagles",
+    "New York Giants": "Giants",
+    "Washington Commanders": "Commanders",
+    "San Francisco 49ers": "49ers",
+    "Los Angeles Rams": "Rams",
+    "Seattle Seahawks": "Seahawks",
+    "Arizona Cardinals": "Cardinals",
+    "Tampa Bay Buccaneers": "Buccaneers",
+    "New Orleans Saints": "Saints",
+    "Carolina Panthers": "Panthers",
+    "Atlanta Falcons": "Falcons",
+    "New England Patriots": "Patriots",
+    "Buffalo Bills": "Bills",
+    "Miami Dolphins": "Dolphins",
+    "New York Jets": "Jets",
+    "Pittsburgh Steelers": "Steelers",
+    "Baltimore Ravens": "Ravens",
+    "Cleveland Browns": "Browns",
+    "Cincinnati Bengals": "Bengals",
+    "Kansas City Chiefs": "Chiefs",
+    "Las Vegas Raiders": "Raiders",
+    "Los Angeles Chargers": "Chargers",
+    "Denver Broncos": "Broncos",
+    "Tennessee Titans": "Titans",
+    "Indianapolis Colts": "Colts",
+    "Houston Texans": "Texans",
+    "Jacksonville Jaguars": "Jaguars"
+}
+
 st.title("🏈 NFL Pick'em Tracker")
 st.caption("For entertainment purposes only. Tracks friendly picks, does not involve betting or money.")
 
@@ -50,7 +149,7 @@ if "mode" not in st.session_state:
     st.session_state.mode = None
 
 if st.session_state.mode is None:
-    mode = st.radio("Choose mode:", ["Public Demo", "Live Mode (Password Required)"])
+    mode = st.radio("Choose mode:", ["Live Mode (Password Required)", "Public Demo"])
     if st.button("Continue"):
         st.session_state.mode = mode
         st.rerun()
@@ -88,7 +187,7 @@ else:
             st.stop()
 
         # Only shown after successful authentication
-        tabs = st.tabs(["Make Picks", "Past Picks", "Group Picks", "Leaderboards"])
+        tabs = st.tabs(["Make Picks", "Past Picks", "Group Picks", "Group Data", "Leaderboards"])
         picks_df = load_picks()
         results_available = RESULTS_FILE.exists() and pd.read_csv(RESULTS_FILE).shape[0] > 0
 
@@ -98,24 +197,21 @@ else:
             user_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == CURRENT_WEEK)]
             session_picks = []
             for g in weekly_games:
+                formatted_game = format_game_with_spread(g["game"], g["spread"])
+                st.write(formatted_game)
+                
+                # Extract teams from game string
+                teams = g["game"].split(" @ ") if "@" in g["game"] else g["game"].split(" vs. ")
+
                 if "@" in g["game"]:
                     away_team, home_team = g["game"].split(" @ ")
                 else:
                     home_team, away_team = g["game"].split(" vs. ")
-                
-                teams = [home_team, away_team]
-                spread = g["spread"]
-                
-                # Format spread with proper +/- signs
-                if spread > 0:
-                    home_spread_text = f"(+{spread})"
-                    away_spread_text = f"(-{spread})"
-                else:
-                    home_spread_text = f"({spread})"  # Already has negative sign
-                    away_spread_text = f"(+{abs(spread)})"
-                
-                # Create formatted game display
-                formatted_game = f"{away_team} {away_spread_text} @ {home_team}"
+
+                teams = [
+                    TEAM_NAME_MAPPING.get(away_team, away_team),
+                    TEAM_NAME_MAPPING.get(home_team, home_team)
+                ]
                 
                 commence_time_str = g.get("commence_time", None)
                 locked = game_has_started(commence_time_str) if commence_time_str else False
@@ -130,7 +226,7 @@ else:
                         st.write("No pick submitted.")
                 else:
                     pick = st.selectbox(
-                        formatted_game,
+                        "Make your pick:",
                         teams,
                         index=teams.index(default) if default in teams else 0,
                         key=f"{g['game']}_{user}"
@@ -179,38 +275,14 @@ else:
             st.subheader("Your Picks This Week")
             current_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == CURRENT_WEEK)]
             if not current_picks.empty:
-                # Create display dataframe with formatted game names and team picks
+                # Create display DataFrame with formatted games
                 current_picks_display = current_picks.copy()
-                
-                # Format the game names with spreads for display
-                formatted_games = []
-                for _, row in current_picks_display.iterrows():
-                    # Find the corresponding game data to get spread info
-                    game_data = next((g for g in weekly_games if g["game"] == row["game"]), None)
-                    if game_data:
-                        # Parse teams and format with spread
-                        if "@" in game_data["game"]:
-                            away_team, home_team = game_data["game"].split(" @ ")
-                        else:
-                            home_team, away_team = game_data["game"].split(" vs. ")
-                        
-                        spread = game_data["spread"]
-                        
-                        # Format spread with proper +/- signs
-                        if spread > 0:
-                            home_spread_text = f"(+{spread})"
-                            away_spread_text = f"(-{spread})"
-                        else:
-                            home_spread_text = f"({spread})"  # Already has negative sign
-                            away_spread_text = f"(+{abs(spread)})"
-                        
-                        # Create formatted game display
-                        formatted_game = f"{away_team} {away_spread_text} @ {home_team}"
-                        formatted_games.append(formatted_game)
-                    else:
-                        formatted_games.append(row["game"])  # Fallback to original if no match
-                
-                current_picks_display["formatted_game"] = formatted_games
+                current_picks_display["formatted_game"] = current_picks_display.apply(
+                    lambda row: format_game_with_spread(row["game"], row["spread"]), 
+                    axis=1
+                )
+                # Convert pick to short name
+                current_picks_display["pick"] = current_picks_display["pick"].map(lambda x: TEAM_NAME_MAPPING.get(x, x))
                 
                 st.table(
                     current_picks_display[["formatted_game", "pick"]].rename(columns={
@@ -245,11 +317,13 @@ else:
                 if not filtered_picks.empty:
                     # Format spreads with + for positive values
                     filtered_picks_display = filtered_picks.copy()
-                    filtered_picks_display["spread"] = filtered_picks_display["spread"].apply(format_spread)
+                    filtered_picks_display["formatted_game"] = filtered_picks_display.apply(
+                        lambda row: format_game_with_spread(row["game"], row["spread"]), 
+                        axis=1
+                  )
                     st.dataframe(
-                        filtered_picks_display[["game", "spread", "pick"]].rename(columns={
-                            "game": "Game",
-                            "spread": "Spread",
+                        filtered_picks_display[["formatted_game", "pick"]].rename(columns={
+                            "formatted_game": "Game",
                             "pick": "Pick"
                         }),
                         use_container_width=True,
@@ -273,25 +347,8 @@ else:
                     
                     if game_started:
                         # Format the game title with spreads
-                        if "@" in g["game"]:
-                            away_team, home_team = g["game"].split(" @ ")
-                        else:
-                            home_team, away_team = g["game"].split(" vs. ")
-                        
-                        spread = g["spread"]
-                        
-                        # Format spread with proper +/- signs
-                        if spread > 0:
-                            home_spread_text = f"(+{spread})"
-                            away_spread_text = f"(-{spread})"
-                        else:
-                            home_spread_text = f"({spread})"  # Already has negative sign
-                            away_spread_text = f"(+{abs(spread)})"
-                        
-                        # Create formatted game display
-                        formatted_game = f"{away_team} {away_spread_text} @ {home_team} {home_spread_text}"
-                        
-                        st.subheader(f"📊 {formatted_game}")
+                        formatted_game = format_game_with_spread(g["game"], g["spread"])
+                        st.write(f"• {formatted_game}")
                         
                         # Get all picks for this game
                         game_picks = current_week_picks[current_week_picks["game"] == g["game"]]
@@ -321,29 +378,124 @@ else:
                     st.subheader("🔒 Upcoming Games")
                     st.write("Picks will be revealed when these games start:")
                     for g in upcoming_games:
-                        # Format upcoming games with spreads too
-                        if "@" in g["game"]:
-                            away_team, home_team = g["game"].split(" @ ")
-                        else:
-                            home_team, away_team = g["game"].split(" vs. ")
-                        
-                        spread = g["spread"]
-                        
-                        # Format spread with proper +/- signs
-                        if spread > 0:
-                            home_spread_text = f"(+{spread})"
-                            away_spread_text = f"(-{spread})"
-                        else:
-                            home_spread_text = f"({spread})"  # Already has negative sign
-                            away_spread_text = f"(+{abs(spread)})"
-                        
-                        # Create formatted game display
-                        formatted_upcoming_game = f"{away_team} {away_spread_text} @ {home_team} {home_spread_text}"
-                        st.write(f"• {formatted_upcoming_game}")
+                        formatted_game = format_game_with_spread(g["game"], g["spread"])
+                        st.write(f"• {formatted_game}")
             else:
                 st.write("No games available for this week.")
 
         with tabs[3]:
+            st.header("Group Statistics")
+            
+            # Overall Statistics
+            if not picks_df.empty and results_available:
+                st.subheader("📊 Overall Picking Trends")
+                
+                results_df = pd.read_csv(RESULTS_FILE)
+                # Only include picks that have results
+                merged_picks = picks_df.merge(results_df, on=['week', 'game'])
+                total_picks = len(merged_picks)
+                
+                if total_picks > 0:  # Only show stats if we have concluded games
+                    # Get spreads for each pick to determine favorite/underdog
+                    picks_with_spreads = merged_picks.copy()
+                    picks_with_spreads['is_favorite'] = picks_with_spreads.apply(
+                        lambda row: (row['spread'] < 0 and row['pick'] in row['game'].split(' @ ')[1]) or 
+                                  (row['spread'] > 0 and row['pick'] in row['game'].split(' @ ')[0]),
+                        axis=1
+                    )
+                    
+                    favorites_picked = picks_with_spreads['is_favorite'].sum()
+                    underdogs_picked = total_picks - favorites_picked
+                    
+                    total_correct = (merged_picks['pick'] == merged_picks['covered']).sum()
+                    favorites_correct = ((merged_picks['pick'] == merged_picks['covered']) & 
+                                      picks_with_spreads['is_favorite']).sum()
+                    underdogs_correct = ((merged_picks['pick'] == merged_picks['covered']) & 
+                                       ~picks_with_spreads['is_favorite']).sum()
+                    
+                    stats_data = {
+                        'Metric': [
+                            'Total Correct Pick %',
+                            'Favorites Correct %',
+                            'Underdogs Correct %',
+                            'Favorites Picked %',
+                            'Underdogs Picked %'
+                        ],
+                        'Value': [
+                            f"{(total_correct/total_picks*100):.1f}%",
+                            f"{(favorites_correct/favorites_picked*100):.1f}%",
+                            f"{(underdogs_correct/underdogs_picked*100):.1f}%",
+                            f"{(favorites_picked/total_picks*100):.1f}%",
+                            f"{(underdogs_picked/total_picks*100):.1f}%"
+                        ]
+                    }
+                    
+                    st.dataframe(
+                        pd.DataFrame(stats_data),
+                        use_container_width=True,
+                        hide_index=True
+                    )
+                else:
+                    st.info("No completed games yet to show statistics.")
+                
+                st.markdown("---")
+            
+            # Update the team charts to only use completed games
+            if results_available:
+                results_df = pd.read_csv(RESULTS_FILE)
+                completed_picks = picks_df.merge(results_df, on=['week', 'game'])
+                
+                if not completed_picks.empty:
+                    # Most commonly picked teams
+                    st.subheader("📈 Most Picked Teams (Completed Games)")
+                    team_picks = completed_picks.groupby("pick").size().reset_index(name="count")
+                    top_teams = team_picks.nlargest(5, "count")
+                    fig = go.Figure(data=[
+                        go.Bar(
+                            x=top_teams["pick"],
+                            y=top_teams["count"],
+                            marker_color=[NFL_TEAM_COLORS.get(team, "#808080") for team in top_teams["pick"]],
+                            text=top_teams["count"],
+                            textposition='auto',
+                        )
+                    ])
+                    fig.update_layout(
+                    yaxis=dict(
+                        tickformat="d",  # Use whole numbers
+                        dtick=1,  # Force tick interval of 1
+                        tick0=0,  # Start ticks at 0
+                        showgrid=True  # Show gridlines
+                    ),
+                    showlegend=False,
+                    yaxis_title="Times Picked"
+                )
+                    st.plotly_chart(fig, use_container_width=True, key="most_picked")
+                    
+                    # Least commonly picked teams
+                    st.subheader("📉 Least Picked Teams (Completed Games)")
+                    bottom_teams = team_picks.nsmallest(5, "count")
+                    fig = go.Figure(data=[
+                        go.Bar(
+                            x=bottom_teams["pick"],
+                            y=bottom_teams["count"],
+                            marker_color=[NFL_TEAM_COLORS.get(team, "#808080") for team in bottom_teams["pick"]],
+                            text=bottom_teams["count"],
+                            textposition='auto',
+                        )
+                    ])
+                    fig.update_layout(
+                    yaxis=dict(
+                        tickformat="d",  # Use whole numbers
+                        dtick=1,  # Force tick interval of 1
+                        tick0=0,  # Start ticks at 0
+                        showgrid=True  # Show gridlines
+                    ),
+                    showlegend=False,
+                    yaxis_title="Times Picked"
+                )
+                    st.plotly_chart(fig, use_container_width=True, key="least_picked")
+
+        with tabs[4]:
             st.header("Leaderboards")
             
             # Always show weekly leaderboard structure
@@ -402,42 +554,191 @@ else:
 
     else:
         # Demo mode
-        st.info("Public demo — view a sample leaderboard. No picks can be made in demo mode.")
-        demo_tabs = st.tabs(["Demo Leaderboard"])
+        st.info("Public demo — view a sample version of the app with pre-filled data.")
+        demo_tabs = st.tabs(["Make Picks", "Past Picks", "Group Picks", "Group Data", "Leaderboards"])
+        demo_picks = [
+            # Week 1
+            {"week": 1, "user": "Jack", "game": "Vikings @ Bears", "spread": -3.0, "pick": "Bears", "timestamp": "2025-08-01 12:00"},
+            {"week": 1, "user": "Louis", "game": "Vikings @ Bears", "spread": -3.0, "pick": "Vikings", "timestamp": "2025-08-01 12:01"},
+            {"week": 1, "user": "Miles", "game": "Vikings @ Bears", "spread": -3.0, "pick": "Vikings", "timestamp": "2025-08-01 12:02"},
+            {"week": 1, "user": "Jack", "game": "Patriots @ Jets", "spread": +7.0, "pick": "Jets", "timestamp": "2025-08-01 12:03"},
+            {"week": 1, "user": "Louis", "game": "Patriots @ Jets", "spread": +7.0, "pick": "Jets", "timestamp": "2025-08-01 12:04"},
+            {"week": 1, "user": "Miles", "game": "Patriots @ Jets", "spread": +7.0, "pick": "Patriots", "timestamp": "2025-08-01 12:05"},
+            # Week 2
+            {"week": 2, "user": "Jack", "game": "Giants @ Cowboys", "spread": -4.0, "pick": "Giants", "timestamp": "2025-08-08 12:00"},
+            {"week": 2, "user": "Louis", "game": "Giants @ Cowboys", "spread": -4.0, "pick": "Giants", "timestamp": "2025-08-08 12:01"},
+            {"week": 2, "user": "Miles", "game": "Giants @ Cowboys", "spread": -4.0, "pick": "Cowboys", "timestamp": "2025-08-08 12:02"},
+            {"week": 2, "user": "Jack", "game": "Eagles @ Commanders", "spread": +2.5, "pick": "Commanders", "timestamp": "2025-08-08 12:03"},
+            {"week": 2, "user": "Louis", "game": "Eagles @ Commanders", "spread": +2.5, "pick": "Eagles", "timestamp": "2025-08-08 12:04"},
+            {"week": 2, "user": "Miles", "game": "Eagles @ Commanders", "spread": +2.5, "pick": "Eagles", "timestamp": "2025-08-08 12:05"},
+            # Week 3
+            {"week": 3, "user": "Jack", "game": "Rams @ Vikings", "spread": -6.0, "pick": "Rams", "timestamp": "2025-08-15 12:00"},
+            {"week": 3, "user": "Louis", "game": "Rams @ Vikings", "spread": -6.0, "pick": "Vikings", "timestamp": "2025-08-15 12:01"},
+            {"week": 3, "user": "Miles", "game": "Rams @ Vikings", "spread": -6.0, "pick": "Rams", "timestamp": "2025-08-15 12:02"},
+            {"week": 3, "user": "Jack", "game": "Seahawks @ Cardinals", "spread": +1.5, "pick": "Cardinals", "timestamp": "2025-08-15 12:03"},
+            {"week": 3, "user": "Louis", "game": "Seahawks @ Cardinals", "spread": +1.5, "pick": "Seahawks", "timestamp": "2025-08-15 12:04"},
+            {"week": 3, "user": "Miles", "game": "Seahawks @ Cardinals", "spread": +1.5, "pick": "Cardinals", "timestamp": "2025-08-15 12:05"},
+        ]
+        demo_results = [
+            {"week": 1, "game": "Vikings @ Bears", "covered": "Vikings"},
+            {"week": 1, "game": "Patriots @ Jets", "covered": "Jets"},
+            {"week": 2, "game": "Giants @ Cowboys", "covered": "Cowboys"},
+            {"week": 2, "game": "Eagles @ Commanders", "covered": "Eagles"},
+            {"week": 3, "game": "Rams @ Vikings", "covered": "Vikings"},
+            {"week": 3, "game": "Seahawks @ Cardinals", "covered": "Seahawks"},
+        ]
+        demo_df = pd.DataFrame(demo_picks)
+        demo_results_df = pd.DataFrame(demo_results)
+
         with demo_tabs[0]:
-            demo_picks = [
-                # Week 1
-                {"week": 1, "user": "Jack", "game": "Vikings @ Bears", "spread": -3.0, "pick": "Bears", "timestamp": "2025-08-01 12:00"},
-                {"week": 1, "user": "Louis", "game": "Vikings @ Bears", "spread": -3.0, "pick": "Vikings", "timestamp": "2025-08-01 12:01"},
-                {"week": 1, "user": "Miles", "game": "Vikings @ Bears", "spread": -3.0, "pick": "Vikings", "timestamp": "2025-08-01 12:02"},
-                {"week": 1, "user": "Jack", "game": "Patriots @ Jets", "spread": +7.0, "pick": "Jets", "timestamp": "2025-08-01 12:03"},
-                {"week": 1, "user": "Louis", "game": "Patriots @ Jets", "spread": +7.0, "pick": "Jets", "timestamp": "2025-08-01 12:04"},
-                {"week": 1, "user": "Miles", "game": "Patriots @ Jets", "spread": +7.0, "pick": "Patriots", "timestamp": "2025-08-01 12:05"},
-                # Week 2
-                {"week": 2, "user": "Jack", "game": "Giants @ Cowboys", "spread": -4.0, "pick": "Giants", "timestamp": "2025-08-08 12:00"},
-                {"week": 2, "user": "Louis", "game": "Giants @ Cowboys", "spread": -4.0, "pick": "Giants", "timestamp": "2025-08-08 12:01"},
-                {"week": 2, "user": "Miles", "game": "Giants @ Cowboys", "spread": -4.0, "pick": "Cowboys", "timestamp": "2025-08-08 12:02"},
-                {"week": 2, "user": "Jack", "game": "Eagles @ Commanders", "spread": +2.5, "pick": "Commanders", "timestamp": "2025-08-08 12:03"},
-                {"week": 2, "user": "Louis", "game": "Eagles @ Commanders", "spread": +2.5, "pick": "Eagles", "timestamp": "2025-08-08 12:04"},
-                {"week": 2, "user": "Miles", "game": "Eagles @ Commanders", "spread": +2.5, "pick": "Eagles", "timestamp": "2025-08-08 12:05"},
-                # Week 3
-                {"week": 3, "user": "Jack", "game": "Rams @ 49ers", "spread": -6.0, "pick": "Rams", "timestamp": "2025-08-15 12:00"},
-                {"week": 3, "user": "Louis", "game": "Rams @ Vikings", "spread": -6.0, "pick": "Vikings", "timestamp": "2025-08-15 12:01"},
-                {"week": 3, "user": "Miles", "game": "Rams @ 49ers", "spread": -6.0, "pick": "Rams", "timestamp": "2025-08-15 12:02"},
-                {"week": 3, "user": "Jack", "game": "Seahawks @ Cardinals", "spread": +1.5, "pick": "Cardinals", "timestamp": "2025-08-15 12:03"},
-                {"week": 3, "user": "Louis", "game": "Seahawks @ Cardinals", "spread": +1.5, "pick": "Seahawks", "timestamp": "2025-08-15 12:04"},
-                {"week": 3, "user": "Miles", "game": "Seahawks @ Cardinals", "spread": +1.5, "pick": "Cardinals", "timestamp": "2025-08-15 12:05"},
+            st.header("Make Picks")
+            st.warning("⚠️ Picks cannot be made in demo mode.")
+            st.write("Sample picks interface shown below:")
+            st.markdown(f"""
+            Example Game:
+            {format_game_with_spread("Vikings @ Bears", -3.0)}
+            """)
+            st.selectbox("Make your pick:", ["Vikings", "Bears"], index=1)
+        
+        # Past Picks Tab
+        with demo_tabs[1]:
+            st.header("Past Picks")
+            col1, col2 = st.columns(2)
+            with col1:
+                week_options = sorted(demo_df["week"].unique())
+                selected_week = st.selectbox("Select Week (Demo):", week_options)
+            with col2:
+                user_options = sorted(demo_df["user"].unique())
+                selected_user = st.selectbox("Select User (Demo):", user_options)
+            
+            filtered_picks = demo_df[
+                (demo_df["week"] == selected_week) & 
+                (demo_df["user"] == selected_user)
             ]
-            demo_results = [
-                {"week": 1, "game": "Vikings @ Bears", "covered": "Vikings"},
-                {"week": 1, "game": "Patriots @ Jets", "covered": "Jets"},
-                {"week": 2, "game": "Giants @ Cowboys", "covered": "Cowboys"},
-                {"week": 2, "game": "Eagles @ Commanders", "covered": "Eagles"},
-                {"week": 3, "game": "Rams @ Vikings", "covered": "Vikings"},
-                {"week": 3, "game": "Seahawks @ Cardinals", "covered": "Seahawks"},
-            ]
-            demo_df = pd.DataFrame(demo_picks)
-            demo_results_df = pd.DataFrame(demo_results)
+            
+            if not filtered_picks.empty:
+                # Merge with results
+                filtered_picks_with_results = filtered_picks.merge(
+                    demo_results_df,
+                    on=['week', 'game'],
+                    how='left'
+                )
+                
+                # Create display DataFrame
+                display_df = filtered_picks_with_results.copy()
+                display_df["formatted_game"] = display_df.apply(
+                    lambda row: format_game_with_spread(row["game"], row["spread"]), 
+                    axis=1
+                )
+                display_df = display_df[["formatted_game", "pick", "covered"]].rename(columns={
+                    "formatted_game": "Game",
+                    "pick": "Your Pick",
+                    "covered": "Winner"
+                })
+                
+                st.dataframe(
+                    display_df,
+                    use_container_width=True,
+                    hide_index=True
+                )
+        
+        # Group Picks Tab
+        with demo_tabs[2]:
+            st.header("Group Picks")
+            # Show sample completed game
+            st.subheader("📊 Sample Completed Game")
+            st.write(format_game_with_spread("Vikings @ Bears", -3.0))
+            sample_picks = demo_df[demo_df["game"] == "Vikings @ Bears"]
+            if not sample_picks.empty:
+                st.dataframe(
+                    sample_picks[["user", "pick"]].rename(columns={
+                        "user": "User",
+                        "pick": "Pick"
+                    }),
+                    use_container_width=True,
+                    hide_index=True
+                )
+        
+        # Group Data Tab
+        with demo_tabs[3]:
+            st.header("Group Statistics")
+            st.subheader("📊 Overall Picking Trends")
+            
+            # Calculate demo statistics
+            demo_merged = demo_df.merge(demo_results_df, on=['week', 'game'])
+            total_picks = len(demo_merged)
+            
+            if total_picks > 0:
+                # Calculate favorite/underdog stats
+                picks_with_spreads = demo_merged.copy()
+                picks_with_spreads['is_favorite'] = picks_with_spreads.apply(
+                    lambda row: (row['spread'] < 0 and row['pick'] in row['game'].split(' @ ')[1]) or 
+                              (row['spread'] > 0 and row['pick'] in row['game'].split(' @ ')[0]),
+                    axis=1
+                )
+                
+                favorites_picked = picks_with_spreads['is_favorite'].sum()
+                underdogs_picked = total_picks - favorites_picked
+                total_correct = (demo_merged['pick'] == demo_merged['covered']).sum()
+                favorites_correct = ((demo_merged['pick'] == demo_merged['covered']) & 
+                                  picks_with_spreads['is_favorite']).sum()
+                underdogs_correct = ((demo_merged['pick'] == demo_merged['covered']) & 
+                                   ~picks_with_spreads['is_favorite']).sum()
+                
+                stats_data = {
+                    'Metric': [
+                        'Total Correct Pick %',
+                        'Favorites Correct %',
+                        'Underdogs Correct %',
+                        'Favorites Picked %',
+                        'Underdogs Picked %'
+                    ],
+                    'Value': [
+                        f"{(total_correct/total_picks*100):.1f}%",
+                        f"{(favorites_correct/favorites_picked*100):.1f}%",
+                        f"{(underdogs_correct/underdogs_picked*100):.1f}%",
+                        f"{(favorites_picked/total_picks*100):.1f}%",
+                        f"{(underdogs_picked/total_picks*100):.1f}%"
+                    ]
+                }
+                st.dataframe(
+                    pd.DataFrame(stats_data),
+                    use_container_width=True,
+                    hide_index=True
+                )
+                
+                # Add sample charts
+                st.subheader("📈 Most Picked Teams")
+                team_picks = demo_df.groupby("pick").size().reset_index(name="count")
+                top_teams = team_picks.nlargest(5, "count")
+                
+                # Debug print to check team names
+                print("Team names in picks:", top_teams["pick"].tolist())
+                print("Available colors:", list(NFL_TEAM_COLORS.keys()))
+                
+                fig = go.Figure(data=[
+                    go.Bar(
+                        x=top_teams["pick"],
+                        y=top_teams["count"],
+                        marker_color=[NFL_TEAM_COLORS[team] if team in NFL_TEAM_COLORS else "#808080" for team in top_teams["pick"]],
+                        text=top_teams["count"],
+                        textposition='auto',
+                    )
+                ])
+                fig.update_layout(
+                    yaxis=dict(
+                        tickformat="d",  # Use whole numbers
+                        dtick=1,  # Force tick interval of 1
+                        tick0=0,  # Start ticks at 0
+                        showgrid=True  # Show gridlines
+                    ),
+                    showlegend=False,
+                    yaxis_title="Times Picked"
+                )
+                st.plotly_chart(fig, use_container_width=True, key="demo_most_picked")
+        
+        # Leaderboards Tab (your existing demo leaderboard code)
+        with demo_tabs[4]:
             demo_scores = scoring.calculate_scores(demo_df, demo_results_df)
             demo_weekly = demo_scores["weekly"]
             demo_total = demo_scores["total"]
@@ -449,7 +750,7 @@ else:
                 demo_weekly_filtered = demo_weekly
             demo_weekly_ranked = add_rank(demo_weekly_filtered, ["correct", "correct_pct"])
             demo_total_ranked = add_rank(demo_total, ["correct", "correct_pct"])
-            st.subheader("🏆 Weekly Leaderboard (Demo)")
+            st.subheader("🏆 Weekly Leaderboard")
             st.dataframe(
                 demo_weekly_ranked.rename(columns={
                     "user": "User",
@@ -461,7 +762,7 @@ else:
                 use_container_width=True,
                 hide_index=True
             )
-            st.subheader("🏆 Season Total Leaderboard (Demo)")
+            st.subheader("🏆 Season Total Leaderboard")
             demo_total_ranked = demo_total_ranked.sort_values("Rank")
             if "best_team" not in demo_total_ranked.columns:
                 demo_total_ranked["best_team"] = "N/A"
