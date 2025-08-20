@@ -7,7 +7,6 @@ from src import data, scoring, config
 DATA_FILE = Path(config.DATA_FILE)
 RESULTS_FILE = Path("data/results.csv")
 CURRENT_WEEK = config.CURRENT_WEEK
-PASSWORD = st.secrets["app_password"]
 USERS = ["Gabe", "Jack", "Jake", "Trapp"]
 
 def load_picks():
