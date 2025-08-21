@@ -15,12 +15,14 @@ def is_game_day():
             
             # Check if any game is today
             if game_time.date() == now.date():
+                print("true")  # Add this line to output result
                 return True
+        print("false")  # Add this line to output result
         return False
     except Exception as e:
         print(f"Error checking game day: {e}")
+        print("false")  # Default to false on error
         return False
 
 if __name__ == "__main__":
-    # Exit with status code 0 if it's a game day, 1 if not
-    exit(0 if is_game_day() else 1)
+    is_game_day()
