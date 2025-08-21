@@ -47,15 +47,30 @@ def assign_week(commence_time_str):
             return week
     return None  # if date doesn't match any week
 
+def get_api_key():
+    """Get API key from environment or streamlit secrets"""
+    # Try environment variable first
+    api_key = os.getenv('API_KEY')
+    if api_key:
+        return api_key
+        
+    # Try streamlit secrets as fallback
+    try:
+        import streamlit as st
+        return st.secrets["API_KEY"]
+    except:
+        raise Exception("No API key found in environment or streamlit secrets")
+
+
 def get_weekly_spreads_from_api(chosen_bookmaker="DraftKings", save_csv=True):
     """
     Fetch NFL spreads from The Odds API for all available games.
     Assigns correct NFL week based on commence_time.
     Saves CSV for caching.
     """
-    API_KEY = os.getenv('API_KEY')
-    if not API_KEY and IN_STREAMLIT:
-        API_KEY = st.secrets["API_KEY"]
+    API_KEY = get_api_key()
+    if not API_KEY:
+        raise Exception("No API key available")
         
     url = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds"
     params = {
@@ -66,56 +81,83 @@ def get_weekly_spreads_from_api(chosen_bookmaker="DraftKings", save_csv=True):
     }
     
     response = requests.get(url, params=params)
-    data = response.json()
-
-    spreads_list = []
-
-    for game in data:
-        try:
-            home_team = game['home_team']
-            away_team = game['away_team']
-            commence_time = game['commence_time']
+    if not response.ok:
+        raise Exception(f"API request failed: {response.status_code} - {response.text}")
+        
+    try:
+        data = response.json()
+        if not isinstance(data, list):
+            raise Exception(f"Unexpected API response format: {data}")
             
-            last_updated = datetime.now().isoformat()
-
-            # Determine NFL week
-            week = assign_week(commence_time)
-            if week is None:
-                continue  # skip games outside schedule
-            
-            # Find the chosen bookmaker
-            bookmaker_data = next((b for b in game['bookmakers'] if b['title'] == chosen_bookmaker), None)
-            if not bookmaker_data:
-                continue  # skip if chosen bookmaker not available
-            
-            outcomes = bookmaker_data['markets'][0]['outcomes']
-            home_spread = next((o['point'] for o in outcomes if o['name'] == home_team), None)
-            if home_spread is None:
+        spreads_list = []
+        for game in data:
+            try:
+                home_team = game.get('home_team')
+                away_team = game.get('away_team')
+                commence_time = game.get('commence_time')
+                
+                if not all([home_team, away_team, commence_time]):
+                    print(f"Skipping game with missing data: {game}")
+                    continue
+                
+                last_updated = datetime.now().isoformat()
+                week = assign_week(commence_time)
+                
+                if week is None:
+                    print(f"Skipping game outside schedule: {commence_time}")
+                    continue
+                
+                bookmakers = game.get('bookmakers', [])
+                bookmaker_data = next((b for b in bookmakers if b['title'] == chosen_bookmaker), None)
+                
+                if not bookmaker_data:
+                    print(f"Skipping game - no {chosen_bookmaker} data")
+                    continue
+                
+                markets = bookmaker_data.get('markets', [])
+                if not markets:
+                    print(f"No markets found for {home_team} vs {away_team}")
+                    continue
+                    
+                outcomes = markets[0].get('outcomes', [])
+                home_spread = next((o['point'] for o in outcomes if o['name'] == home_team), None)
+                
+                if home_spread is None:
+                    print(f"No spread found for {home_team}")
+                    continue
+                
+                spreads_list.append({
+                    "week": week,
+                    "home_team": home_team,
+                    "away_team": away_team,
+                    "commence_time": commence_time,
+                    "spread": home_spread,
+                    "bookmaker": chosen_bookmaker,
+                    "game": f"{away_team} @ {home_team}",
+                    "last_updated": last_updated
+                })
+            except Exception as e:
+                print(f"Error processing game: {e}")
                 continue
-            
-            spreads_list.append({
-                "week": week,
-                "home_team": home_team,
-                "away_team": away_team,
-                "commence_time": commence_time,
-                "spread": home_spread,
-                "bookmaker": chosen_bookmaker,
-                "game": f"{away_team} @ {home_team}",   
-            })
-        except (IndexError, KeyError):
-            continue
 
-    # Save CSV
-    if save_csv:
-        Path("data").mkdir(exist_ok=True)
-        csv_file = f"data/weekly_spreads.csv"
-        with open(csv_file, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=["week","home_team","away_team","commence_time","spread","bookmaker", "game", "last_updated"])
-            writer.writeheader()
-            writer.writerows(spreads_list)
-        print(f"Saved CSV to {csv_file}")
+        if not spreads_list:
+            print("No valid games found in API response")
+            return []
 
-    return spreads_list
+        # Save CSV
+        if save_csv:
+            Path("data").mkdir(exist_ok=True)
+            csv_file = "data/weekly_spreads.csv"
+            with open(csv_file, "w", newline="") as f:
+                writer = csv.DictWriter(f, fieldnames=["week","home_team","away_team","commence_time","spread","bookmaker","game","last_updated"])
+                writer.writeheader()
+                writer.writerows(spreads_list)
+            print(f"Saved {len(spreads_list)} games to {csv_file}")
+
+        return spreads_list
+        
+    except Exception as e:
+        raise Exception(f"Error processing API response: {str(e)}")
 
 def get_weekly_spreads(week, chosen_bookmaker="DraftKings"):
     """
