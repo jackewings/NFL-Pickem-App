@@ -58,6 +58,13 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+          # Stash any unstaged changes
+          git stash -u
+          # Pull latest changes
           git pull origin main --rebase
+          # Pop stashed changes
+          git stash pop || true
+          # Force add the CSV file
           git add -f data/weekly_spreads.csv
+          # Commit and push if there are changes
           git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update NFL data" && git push origin main)
