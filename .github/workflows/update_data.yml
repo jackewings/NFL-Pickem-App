@@ -3,7 +3,7 @@ name: Update NFL Data
 on:
   schedule:
     # Run check every hour from 7:30 AM to 7:30 PM CT
-    - cron: '30 12-00 * * *'  # 7:30 AM - 7:30 PM CT (12:30-00:30 UTC)
+    - cron: '30 12-19 * * *'  # 7:30 AM - 7:30 PM CT (12:30-19:30 UTC)
     # Also run at set times on non-game days
     - cron: '0 15,19,23 * * *'  # 10 AM, 2 PM, 6 PM CT
   # Add manual trigger
