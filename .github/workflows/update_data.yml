@@ -2,26 +2,21 @@ name: Update NFL Data
 
 on:
   schedule:
-    # Run check every hour from 7:30 AM to 7:30 PM CT
-    - cron: '30 12-19 * * *'  # 7:30 AM - 7:30 PM CT (12:30-19:30 UTC)
-    # Also run at set times on non-game days
+    - cron: '30 12-19 * * *'  # 7:30 AM - 2:30 PM CT
     - cron: '0 15,19,23 * * *'  # 10 AM, 2 PM, 6 PM CT
-  # Add manual trigger
   workflow_dispatch:
 
 jobs:
   check-and-update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Add this line for write permissions
+      contents: write
     
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v3
       
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
           
@@ -32,24 +27,30 @@ jobs:
           
       - name: Check if game day
         id: check-game-day
-        run: python src/check_game_day.py
-        
-      - name: Update data on game day
-        if: success() && github.event_name == 'schedule' && github.event.schedule == '30 12-00 * * *'
+        run: |
+          OUTPUT=$(python src/check_game_day.py)
+          echo "IS_GAME_DAY=${OUTPUT}" >> $GITHUB_ENV
+          
+      - name: Update data (game day hourly)
+        if: |
+          env.IS_GAME_DAY == 'true' && 
+          github.event.schedule == '30 12-19 * * *'
         env:
-          ODDS_API_KEY: ${{ secrets.API_KEY }}
+          API_KEY: ${{ secrets.API_KEY }}
         run: python src/update_data.py
           
-      - name: Update data on non-game day scheduled times
-        if: success() && github.event_name == 'schedule' && github.event.schedule == '0 15,19,23 * * *'
+      - name: Update data (non-game day scheduled)
+        if: |
+          env.IS_GAME_DAY == 'false' && 
+          github.event.schedule == '0 15,19,23 * * *'
         env:
-          ODDS_API_KEY: ${{ secrets.API_KEY }}
+          API_KEY: ${{ secrets.API_KEY }}
         run: python src/update_data.py
 
       - name: Manual update
         if: github.event_name == 'workflow_dispatch'
         env:
-          ODDS_API_KEY: ${{ secrets.API_KEY }}
+          API_KEY: ${{ secrets.API_KEY }}
         run: python src/update_data.py
           
       - name: Commit and push if changed
