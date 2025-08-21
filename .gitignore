@@ -1,8 +1,13 @@
 # Streamlit secrets (local only)
 .streamlit/
 
-# Data files (picks, results, etc.)
-data/
+# Keep tracking weekly spreads
+!data/
+!data/weekly_spreads.csv
+
+# Ignore other data files
+data/*
+!data/weekly_spreads.csv
 
 # Python cache
 __pycache__/
