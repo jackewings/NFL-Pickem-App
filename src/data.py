@@ -90,6 +90,7 @@ def get_weekly_spreads_from_api(chosen_bookmaker="DraftKings", save_csv=True):
             raise Exception(f"Unexpected API response format: {data}")
             
         spreads_list = []
+        central = pytz.timezone('America/Chicago')
         for game in data:
             try:
                 home_team = game.get('home_team')
@@ -125,6 +126,8 @@ def get_weekly_spreads_from_api(chosen_bookmaker="DraftKings", save_csv=True):
                 if home_spread is None:
                     print(f"No spread found for {home_team}")
                     continue
+                
+                last_updated = datetime.now(pytz.UTC).astimezone(central).isoformat()
                 
                 spreads_list.append({
                     "week": week,
