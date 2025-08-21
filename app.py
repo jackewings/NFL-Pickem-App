@@ -102,8 +102,11 @@ def format_game_with_spread(game, spread):
     away_team = TEAM_NAME_MAPPING.get(away_team, away_team)
     home_team = TEAM_NAME_MAPPING.get(home_team, home_team)
     
-    # Format spread with proper +/- signs
-    formatted_spread = format_spread(spread)
+    # For away team display, flip the spread since we're showing from away team perspective
+    away_spread = -spread  # Flip the sign for away team perspective
+    formatted_spread = format_spread(away_spread)
+    
+    # Display as "Away (spread) @ Home"
     return f"{away_team} ({formatted_spread}) @ {home_team}"
 
 TEAM_NAME_MAPPING = {
@@ -194,6 +197,12 @@ else:
         with tabs[0]:
             st.header(f"Week {CURRENT_WEEK} Picks — {user}")
             weekly_games = data.get_weekly_spreads(CURRENT_WEEK)
+
+            if weekly_games and len(weekly_games) > 0:
+                if "last_updated" in weekly_games[0]:
+                    last_updated = datetime.fromisoformat(weekly_games[0]["last_updated"])
+                    st.caption(f"Lines last updated: {last_updated.strftime('%Y-%m-%d %I:%M %p CT')}")
+
             user_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == CURRENT_WEEK)]
             session_picks = []
             for g in weekly_games:
@@ -467,7 +476,8 @@ else:
                         showgrid=True  # Show gridlines
                     ),
                     showlegend=False,
-                    yaxis_title="Times Picked"
+                    yaxis_title="Times Picked",
+                    dragmode=False
                 )
                     st.plotly_chart(fig, use_container_width=True, key="most_picked")
                     
@@ -491,9 +501,68 @@ else:
                         showgrid=True  # Show gridlines
                     ),
                     showlegend=False,
-                    yaxis_title="Times Picked"
+                    yaxis_title="Times Picked",
+                    dragmode=False
                 )
                     st.plotly_chart(fig, use_container_width=True, key="least_picked")
+
+                    ats_records = pd.DataFrame()
+                    for team in NFL_TEAM_COLORS.keys():
+                        games_covered = len(results_df[results_df['covered'] == team])
+                        total_games = len(results_df[results_df['game'].str.contains(team)])
+                        if total_games > 0:
+                            ats_records = pd.concat([ats_records, pd.DataFrame({
+                                'team': [team],
+                                'covered': [games_covered],
+                                'total': [total_games],
+                                'pct': [games_covered/total_games]
+                            })])
+                    
+                    # Hot teams
+                    st.subheader("🔥 Best Teams Against the Spread")
+                    hot_teams = ats_records.nlargest(5, 'pct')
+                    fig = go.Figure(data=[
+                        go.Bar(
+                            x=hot_teams["team"],
+                            y=hot_teams["pct"].multiply(100),
+                            marker_color=[NFL_TEAM_COLORS.get(team, "#808080") for team in hot_teams["team"]],
+                            text=hot_teams["pct"].apply(lambda x: f"{x*100:.1f}%"),
+                            textposition='auto',
+                        )
+                    ])
+                    fig.update_layout(
+                        yaxis=dict(
+                            tickformat=".0%",
+                            range=[0, 100],
+                            title="Cover %"
+                        ),
+                        dragmode=False,
+                        showlegend=False
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    # Cold teams
+                    st.subheader("❄️ Worst Teams Against the Spread")
+                    cold_teams = ats_records.nsmallest(5, 'pct')
+                    fig = go.Figure(data=[
+                        go.Bar(
+                            x=cold_teams["team"],
+                            y=cold_teams["pct"].multiply(100),
+                            marker_color=[NFL_TEAM_COLORS.get(team, "#808080") for team in cold_teams["team"]],
+                            text=cold_teams["pct"].apply(lambda x: f"{x*100:.1f}%"),
+                            textposition='auto',
+                        )
+                    ])
+                    fig.update_layout(
+                        yaxis=dict(
+                            tickformat=".0%",
+                            range=[0, 100],
+                            title="Cover %"
+                        ),
+                        dragmode=False,
+                        showlegend=False
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
 
         with tabs[4]:
             st.header("Leaderboards")
@@ -558,12 +627,12 @@ else:
         demo_tabs = st.tabs(["Make Picks", "Past Picks", "Group Picks", "Group Data", "Leaderboards"])
         demo_picks = [
             # Week 1
-            {"week": 1, "user": "Jack", "game": "Vikings @ Bears", "spread": -3.0, "pick": "Bears", "timestamp": "2025-08-01 12:00"},
-            {"week": 1, "user": "Louis", "game": "Vikings @ Bears", "spread": -3.0, "pick": "Vikings", "timestamp": "2025-08-01 12:01"},
-            {"week": 1, "user": "Miles", "game": "Vikings @ Bears", "spread": -3.0, "pick": "Vikings", "timestamp": "2025-08-01 12:02"},
-            {"week": 1, "user": "Jack", "game": "Patriots @ Jets", "spread": +7.0, "pick": "Jets", "timestamp": "2025-08-01 12:03"},
-            {"week": 1, "user": "Louis", "game": "Patriots @ Jets", "spread": +7.0, "pick": "Jets", "timestamp": "2025-08-01 12:04"},
-            {"week": 1, "user": "Miles", "game": "Patriots @ Jets", "spread": +7.0, "pick": "Patriots", "timestamp": "2025-08-01 12:05"},
+            {"week": 1, "user": "Jack", "game": "Vikings @ Bears", "spread": 3.0, "pick": "Bears", "timestamp": "2025-08-01 12:00"},
+            {"week": 1, "user": "Louis", "game": "Vikings @ Bears", "spread": 3.0, "pick": "Vikings", "timestamp": "2025-08-01 12:01"},
+            {"week": 1, "user": "Miles", "game": "Vikings @ Bears", "spread": 3.0, "pick": "Vikings", "timestamp": "2025-08-01 12:02"},
+            {"week": 1, "user": "Jack", "game": "Patriots @ Jets", "spread": 1.5, "pick": "Jets", "timestamp": "2025-08-01 12:03"},
+            {"week": 1, "user": "Louis", "game": "Patriots @ Jets", "spread": 1.5, "pick": "Jets", "timestamp": "2025-08-01 12:04"},
+            {"week": 1, "user": "Miles", "game": "Patriots @ Jets", "spread": 1.5, "pick": "Patriots", "timestamp": "2025-08-01 12:05"},
             # Week 2
             {"week": 2, "user": "Jack", "game": "Giants @ Cowboys", "spread": -4.0, "pick": "Giants", "timestamp": "2025-08-08 12:00"},
             {"week": 2, "user": "Louis", "game": "Giants @ Cowboys", "spread": -4.0, "pick": "Giants", "timestamp": "2025-08-08 12:01"},
@@ -572,12 +641,12 @@ else:
             {"week": 2, "user": "Louis", "game": "Eagles @ Commanders", "spread": +2.5, "pick": "Eagles", "timestamp": "2025-08-08 12:04"},
             {"week": 2, "user": "Miles", "game": "Eagles @ Commanders", "spread": +2.5, "pick": "Eagles", "timestamp": "2025-08-08 12:05"},
             # Week 3
-            {"week": 3, "user": "Jack", "game": "Rams @ Vikings", "spread": -6.0, "pick": "Rams", "timestamp": "2025-08-15 12:00"},
-            {"week": 3, "user": "Louis", "game": "Rams @ Vikings", "spread": -6.0, "pick": "Vikings", "timestamp": "2025-08-15 12:01"},
-            {"week": 3, "user": "Miles", "game": "Rams @ Vikings", "spread": -6.0, "pick": "Rams", "timestamp": "2025-08-15 12:02"},
-            {"week": 3, "user": "Jack", "game": "Seahawks @ Cardinals", "spread": +1.5, "pick": "Cardinals", "timestamp": "2025-08-15 12:03"},
-            {"week": 3, "user": "Louis", "game": "Seahawks @ Cardinals", "spread": +1.5, "pick": "Seahawks", "timestamp": "2025-08-15 12:04"},
-            {"week": 3, "user": "Miles", "game": "Seahawks @ Cardinals", "spread": +1.5, "pick": "Cardinals", "timestamp": "2025-08-15 12:05"},
+            {"week": 3, "user": "Jack", "game": "Rams @ Vikings", "spread": -3.5, "pick": "Rams", "timestamp": "2025-08-15 12:00"},
+            {"week": 3, "user": "Louis", "game": "Rams @ Vikings", "spread": -3.5, "pick": "Vikings", "timestamp": "2025-08-15 12:01"},
+            {"week": 3, "user": "Miles", "game": "Rams @ Vikings", "spread": -3.5, "pick": "Rams", "timestamp": "2025-08-15 12:02"},
+            {"week": 3, "user": "Jack", "game": "Seahawks @ Cardinals", "spread": 1.5, "pick": "Cardinals", "timestamp": "2025-08-15 12:03"},
+            {"week": 3, "user": "Louis", "game": "Seahawks @ Cardinals", "spread": 1.5, "pick": "Seahawks", "timestamp": "2025-08-15 12:04"},
+            {"week": 3, "user": "Miles", "game": "Seahawks @ Cardinals", "spread": 1.5, "pick": "Cardinals", "timestamp": "2025-08-15 12:05"},
         ]
         demo_results = [
             {"week": 1, "game": "Vikings @ Bears", "covered": "Vikings"},
@@ -632,8 +701,8 @@ else:
                 )
                 display_df = display_df[["formatted_game", "pick", "covered"]].rename(columns={
                     "formatted_game": "Game",
-                    "pick": "Your Pick",
-                    "covered": "Winner"
+                    "pick": "Selection",
+                    "covered": "Covered"
                 })
                 
                 st.dataframe(
@@ -733,7 +802,8 @@ else:
                         showgrid=True  # Show gridlines
                     ),
                     showlegend=False,
-                    yaxis_title="Times Picked"
+                    yaxis_title="Times Picked",
+                    dragmode=False
                 )
                 st.plotly_chart(fig, use_container_width=True, key="demo_most_picked")
         

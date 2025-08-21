@@ -66,6 +66,8 @@ def get_weekly_spreads_from_api(chosen_bookmaker="DraftKings", save_csv=True):
             away_team = game['away_team']
             commence_time = game['commence_time']
             
+            last_updated = datetime.now().isoformat()
+
             # Determine NFL week
             week = assign_week(commence_time)
             if week is None:
@@ -96,9 +98,9 @@ def get_weekly_spreads_from_api(chosen_bookmaker="DraftKings", save_csv=True):
     # Save CSV
     if save_csv:
         Path("data").mkdir(exist_ok=True)
-        csv_file = f"data/weekly_spreads.csv"  # All weeks in one CSV
+        csv_file = f"data/weekly_spreads.csv"
         with open(csv_file, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=["week","home_team","away_team","commence_time","spread","bookmaker", 'game'])
+            writer = csv.DictWriter(f, fieldnames=["week","home_team","away_team","commence_time","spread","bookmaker", "game", "last_updated"])
             writer.writeheader()
             writer.writerows(spreads_list)
         print(f"Saved CSV to {csv_file}")
