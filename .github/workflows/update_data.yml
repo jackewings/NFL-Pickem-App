@@ -28,7 +28,8 @@ jobs:
       - name: Check if game day
         id: check-game-day
         run: |
-          OUTPUT=$(python src/check_game_day.py)
+          PYTHONPATH=$PYTHONPATH:$(pwd) python src/check_game_day.py
+          OUTPUT=$(PYTHONPATH=$PYTHONPATH:$(pwd) python src/check_game_day.py)
           echo "IS_GAME_DAY=${OUTPUT}" >> $GITHUB_ENV
           
       - name: Update data (game day hourly)

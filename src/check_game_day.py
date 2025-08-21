@@ -1,6 +1,6 @@
 from datetime import datetime
 import pytz
-from src import data
+import data  # Changed from 'from src import data'
 
 def is_game_day():
     """Check if today has any NFL games scheduled"""
@@ -15,13 +15,13 @@ def is_game_day():
             
             # Check if any game is today
             if game_time.date() == now.date():
-                print("true")  # Add this line to output result
+                print("true")
                 return True
-        print("false")  # Add this line to output result
+        print("false")
         return False
     except Exception as e:
         print(f"Error checking game day: {e}")
-        print("false")  # Default to false on error
+        print("false")
         return False
 
 if __name__ == "__main__":
