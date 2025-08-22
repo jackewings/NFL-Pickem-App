@@ -51,19 +51,19 @@ jobs:
             # Game day - update if between 6:30 AM and 11:30 PM CT
             if [[ "$HOUR" -ge 6 && "$HOUR" -le 23 && "$MIN" == "30" ]]; then
               echo "Game day update at $HOUR:$MIN CT"
-              python src/update_data.py
+              python src/core/update_data.py
             fi
           elif [[ "$HOUR" =~ ^(6|12|18)$ && "$MIN" == "30" ]]; then
             # Non-game day scheduled update
             echo "Non-game day update at $HOUR:$MIN CT"
-            python src/update_data.py
+            python src/core/update_data.py
           fi
 
       - name: Manual update
         if: github.event_name == 'workflow_dispatch'
         env:
           API_KEY: ${{ secrets.API_KEY }}
-        run: python src/update_data.py
+        run: python src/core/update_data.py
           
       - name: Commit and push if changed
         run: |
