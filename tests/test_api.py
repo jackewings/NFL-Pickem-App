@@ -1,53 +1,95 @@
 import unittest
 from unittest.mock import patch, MagicMock
-import pandas as pd
-from datetime import datetime
-import json
-from pathlib import Path
 from src.core.data import NFLData
 
-class TestNFLData(unittest.TestCase):
+class TestGameResults(unittest.TestCase):
     def setUp(self):
+        """Set up test fixtures"""
         self.nfl_data = NFLData(data_dir="test_data")
-        # Load real sample data from your json file
-        fixtures_path = Path(__file__).parent / 'fixtures' / 'weekly_spreads_sample.json'
-        with open(fixtures_path, 'r') as f:
-            self.sample_game_response = json.load(f)
-
-    @patch('src.api.odds_api.OddsAPI.get_nfl_spreads')
-    def test_get_weekly_spreads_from_api(self, mock_get_spreads):
-        # Mock the API response with real sample data
-        mock_get_spreads.return_value = self.sample_game_response
         
-        # Test with save_csv=False to avoid file operations
-        spreads = self.nfl_data.get_weekly_spreads_from_api(save_csv=False)
+        # Sample game scores data
+        self.sample_scores = [
+            {
+                'home_team': 'Philadelphia Eagles',
+                'away_team': 'Dallas Cowboys',
+                'scores_home': 24,  # Eagles win by 4
+                'scores_away': 20,
+                'completed': True
+            },
+            {
+                'home_team': 'New York Giants',
+                'away_team': 'Washington Commanders',
+                'scores_home': 21,  # Giants win by 1
+                'scores_away': 20,
+                'completed': True
+            }
+        ]
         
-        # Test first game in the list
-        self.assertTrue(len(spreads) > 0)
-        self.assertEqual(spreads[0]['home_team'], 'Philadelphia Eagles')
-        self.assertEqual(spreads[0]['away_team'], 'Dallas Cowboys')
-        self.assertEqual(spreads[0]['spread'], -7.0)
-
-    @patch('pandas.read_csv')
-    def test_get_weekly_spreads_cached(self, mock_read_csv):
-        # Create mock DataFrame with all games from sample data
-        mock_data = []
-        for game in self.sample_game_response:
-            mock_data.append({
+        # Sample spreads data
+        self.sample_spreads = [
+            {
                 'week': 1,
-                'home_team': game['home_team'],
-                'away_team': game['away_team'],
-                'spread': game['bookmakers'][0]['markets'][0]['outcomes'][1]['point']
-                if game['bookmakers'][0]['markets'][0]['outcomes'][1]['name'] == game['home_team']
-                else game['bookmakers'][0]['markets'][0]['outcomes'][0]['point']
-            })
+                'game': 'Dallas Cowboys @ Philadelphia Eagles',
+                'spread': -3.0  # Eagles favored by 3
+            },
+            {
+                'week': 1,
+                'game': 'Washington Commanders @ New York Giants',
+                'spread': -2.5  # Giants favored by 2.5
+            }
+        ]
+
+    @patch('src.api.odds_api.OddsAPI.get_game_scores')
+    @patch('src.core.data.NFLData.get_weekly_spreads')
+    def test_favorite_covers(self, mock_get_spreads, mock_get_scores):
+        """Test when favorite covers the spread"""
+        mock_get_scores.return_value = [self.sample_scores[0]]
+        mock_get_spreads.return_value = [self.sample_spreads[0]]
         
-        mock_df = pd.DataFrame(mock_data)
-        mock_read_csv.return_value = mock_df
+        results = self.nfl_data.get_game_results(week=1)
         
-        spreads = self.nfl_data.get_weekly_spreads(week=1)
-        self.assertEqual(len(spreads), len(mock_data))
-        self.assertEqual(spreads[0]['spread'], -7.0)  # Eagles spread from sample data
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['covered'], 'Philadelphia Eagles')  # Won by 4, covered -3
+
+    @patch('src.api.odds_api.OddsAPI.get_game_scores')
+    @patch('src.core.data.NFLData.get_weekly_spreads')
+    def test_favorite_doesnt_cover(self, mock_get_spreads, mock_get_scores):
+        """Test when favorite wins but doesn't cover"""
+        mock_scores = self.sample_scores[1]  # Giants win by 1
+        mock_get_scores.return_value = [mock_scores]
+        mock_get_spreads.return_value = [self.sample_spreads[1]]  # Spread is -2.5
+        
+        results = self.nfl_data.get_game_results(week=1)
+        
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['covered'], 'Washington Commanders')  # Giants didn't cover -2.5
+
+    @patch('src.api.odds_api.OddsAPI.get_game_scores')
+    @patch('src.core.data.NFLData.get_weekly_spreads')
+    def test_push(self, mock_get_spreads, mock_get_scores):
+        """Test when final score difference equals spread (push)"""
+        mock_scores = self.sample_scores[0].copy()
+        mock_scores['scores_home'] = 23  # Eagles win by exactly 3
+        mock_get_scores.return_value = [mock_scores]
+        mock_get_spreads.return_value = [self.sample_spreads[0]]  # Spread is -3
+        
+        results = self.nfl_data.get_game_results(week=1)
+        
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0]['covered'])  # Should be None for push
+
+    @patch('src.api.odds_api.OddsAPI.get_game_scores')
+    @patch('src.core.data.NFLData.get_weekly_spreads')
+    def test_missing_data(self, mock_get_spreads, mock_get_scores):
+        """Test handling of missing or invalid data"""
+        mock_scores = self.sample_scores[0].copy()
+        mock_scores['scores_home'] = None
+        mock_get_scores.return_value = [mock_scores]
+        mock_get_spreads.return_value = [self.sample_spreads[0]]
+        
+        results = self.nfl_data.get_game_results(week=1)
+        
+        self.assertEqual(len(results), 0)  # Should skip games with missing data
 
 if __name__ == '__main__':
     unittest.main()

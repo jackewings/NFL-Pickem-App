@@ -46,10 +46,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# File paths
-PICKS_FILE = Path(DATA_DIR) / "picks.csv"
-RESULTS_FILE = Path(DATA_DIR) / "results.csv"
-
 def load_picks():
     """Load picks from CSV file"""
     empty_df = pd.DataFrame(columns=["week", "user", "game", "spread", "pick", "timestamp"])
@@ -265,7 +261,7 @@ def render_past_picks_tab(picks_df):
         if available_weeks:
             selected_week = st.selectbox("Select Week:", available_weeks)
         else:
-            st.write("No past weeks available yet.")
+            st.info("No past weeks available yet.")
             selected_week = None
     
     with col2:
@@ -353,7 +349,7 @@ def render_group_data_tab(picks_df):
     
     # Overall Statistics
     if not picks_df.empty and results_available:
-        st.subheader("📊 Overall Picking Trends")
+        st.subheader("📊 Overall Pick Trends")
         
         results_df = pd.read_csv(RESULTS_FILE)
         # Only include picks that have results
@@ -402,6 +398,8 @@ def render_group_data_tab(picks_df):
             )
         else:
             st.info("No completed games yet to show statistics.")
+    else:
+        st.info("No completed games yet to show statistics.")
         
         st.markdown("---")
     
@@ -665,6 +663,9 @@ def render_live_mode():
     # Only shown after successful authentication
     tabs = st.tabs(["Make Picks", "Past Picks", "Group Picks", "Group Data", "Leaderboards"])
     picks_df = load_picks()
+    if results_available:
+        results_df = pd.read_csv(RESULTS_FILE)  # Use real results
+        scores = scoring.calculate_scores(picks_df, results_df)
 
     # Render each tab
     with tabs[0]:
@@ -724,9 +725,8 @@ def render_demo_mode():
 
     # Create DataFrames from demo data
     demo_df = pd.DataFrame(demo_picks)
-    demo_results_df = pd.DataFrame(demo_results)
+    demo_results_df = pd.read_csv(Path(DATA_DIR) / "demo_results.csv")  # Use demo results
 
-    # Calculate scores
     demo_scores = scoring.calculate_scores(demo_df, demo_results_df)
     demo_weekly = demo_scores.weekly
     demo_total = demo_scores.total

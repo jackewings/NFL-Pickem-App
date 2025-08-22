@@ -72,5 +72,27 @@ class TestGameResults(unittest.TestCase):
         results = self.nfl_data.get_game_results(week=1)
         self.assertEqual(results[0]['covered'], None)  # Should be None for a push
 
+    @patch('src.api.odds_api.OddsAPI.get_nfl_spreads')  # Note: using spreads endpoint
+    def test_get_game_scores(self, mock_get_spreads):
+        # Mock API response with completed game
+        mock_get_spreads.return_value = [{
+            'id': 'test_game',
+            'home_team': 'Philadelphia Eagles',
+            'away_team': 'Dallas Cowboys',
+            'scores': {
+                'home_score': 27,
+                'away_score': 17
+            },
+            'completed': True
+        }]
+    
+    api = OddsAPI()
+    scores = api.get_game_scores()
+    
+    self.assertEqual(len(scores), 1)
+    self.assertEqual(scores[0]['scores_home'], 27)
+    self.assertEqual(scores[0]['scores_away'], 17)
+    self.assertTrue(scores[0]['completed'])
+
 if __name__ == '__main__':
     unittest.main()
