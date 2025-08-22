@@ -1,17 +1,64 @@
 # Streamlit secrets (local only)
 .streamlit/
 
-# Keep tracking weekly spreads
+# Data files
+data/*
 !data/
 !data/weekly_spreads.csv
 
-# Ignore other data files
-data/*
-!data/weekly_spreads.csv
-
-# Python cache
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
 
-# API key
+# Virtual Environment
+venv/
+ENV/
 .env
+.venv
+.env.local
+venv/
+ENV/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+.env.local
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Project specific
+data/*.csv
+.streamlit/secrets.toml

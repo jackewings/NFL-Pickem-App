@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 from datetime import datetime
 import pytz
-import data  # Changed from 'from src import data'
+import core.data as data  # Changed from 'from src import data'
 import logging
 
 # Set up logging
