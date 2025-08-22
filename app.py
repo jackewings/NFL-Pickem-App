@@ -132,10 +132,13 @@ def format_game_with_spread(game, spread):
     away_display = TEAM_DISPLAY_NAMES.get(away_team, away_team)
     home_display = TEAM_DISPLAY_NAMES.get(home_team, home_team)
     
-    # Fix: Don't negate the spread for away team, use it as is
-    formatted_spread = format_spread(spread) 
+    # Fix: Negate the spread for away team
+    # If spread is negative, home team is favored, so away team gets positive spread
+    # If spread is positive, home team is underdog, so away team gets negative spread
+    away_spread = -spread
+    formatted_away_spread = format_spread(away_spread)
     
-    return f"{away_display} ({formatted_spread}) @ {home_display}"
+    return f"{away_display} ({formatted_away_spread}) @ {home_display}"
 
 def render_make_picks_tab(user, picks_df, weekly_games):
     """Render the Make Picks tab content"""
@@ -660,26 +663,26 @@ def render_demo_mode():
     # Create demo data
     demo_picks = [
     # Week 1
-    {"week": 1, "user": "Jack", "game": "Minnesota Vikings @ Chicago Bears", "spread": -3.0, "pick": "Chicago Bears", "timestamp": "2025-08-01 12:00"},
-    {"week": 1, "user": "Louis", "game": "Minnesota Vikings @ Chicago Bears", "spread": -3.0, "pick": "Minnesota Vikings", "timestamp": "2025-08-01 12:01"},
-    {"week": 1, "user": "Miles", "game": "Minnesota Vikings @ Chicago Bears", "spread": -3.0, "pick": "Minnesota Vikings", "timestamp": "2025-08-01 12:02"},
-    {"week": 1, "user": "Jack", "game": "New England Patriots @ New York Jets", "spread": -1.5, "pick": "New York Jets", "timestamp": "2025-08-01 12:03"},
-    {"week": 1, "user": "Louis", "game": "New England Patriots @ New York Jets", "spread": -1.5, "pick": "New York Jets", "timestamp": "2025-08-01 12:04"},
-    {"week": 1, "user": "Miles", "game": "New England Patriots @ New York Jets", "spread": -1.5, "pick": "New England Patriots", "timestamp": "2025-08-01 12:05"},
+    {"week": 1, "user": "Jack", "game": "Minnesota Vikings @ Chicago Bears", "spread": 3.0, "pick": "Chicago Bears", "timestamp": "2025-08-01 12:00"},
+    {"week": 1, "user": "Louis", "game": "Minnesota Vikings @ Chicago Bears", "spread": 3.0, "pick": "Minnesota Vikings", "timestamp": "2025-08-01 12:01"},
+    {"week": 1, "user": "Miles", "game": "Minnesota Vikings @ Chicago Bears", "spread": 3.0, "pick": "Minnesota Vikings", "timestamp": "2025-08-01 12:02"},
+    {"week": 1, "user": "Jack", "game": "New England Patriots @ New York Jets", "spread": 1.5, "pick": "New York Jets", "timestamp": "2025-08-01 12:03"},
+    {"week": 1, "user": "Louis", "game": "New England Patriots @ New York Jets", "spread": 1.5, "pick": "New York Jets", "timestamp": "2025-08-01 12:04"},
+    {"week": 1, "user": "Miles", "game": "New England Patriots @ New York Jets", "spread": 1.5, "pick": "New England Patriots", "timestamp": "2025-08-01 12:05"},
     # Week 2
-    {"week": 2, "user": "Jack", "game": "New York Giants @ Dallas Cowboys", "spread": 4.0, "pick": "New York Giants", "timestamp": "2025-08-08 12:00"},
-    {"week": 2, "user": "Louis", "game": "New York Giants @ Dallas Cowboys", "spread": 4.0, "pick": "New York Giants", "timestamp": "2025-08-08 12:01"},
-    {"week": 2, "user": "Miles", "game": "New York Giants @ Dallas Cowboys", "spread": 4.0, "pick": "Dallas Cowboys", "timestamp": "2025-08-08 12:02"},
-    {"week": 2, "user": "Jack", "game": "Philadelphia Eagles @ Washington Commanders", "spread": -2.5, "pick": "Washington Commanders", "timestamp": "2025-08-08 12:03"},
-    {"week": 2, "user": "Louis", "game": "Philadelphia Eagles @ Washington Commanders", "spread": -2.5, "pick": "Philadelphia Eagles", "timestamp": "2025-08-08 12:04"},
-    {"week": 2, "user": "Miles", "game": "Philadelphia Eagles @ Washington Commanders", "spread": -2.5, "pick": "Philadelphia Eagles", "timestamp": "2025-08-08 12:05"},
+    {"week": 2, "user": "Jack", "game": "New York Giants @ Dallas Cowboys", "spread": -4.0, "pick": "New York Giants", "timestamp": "2025-08-08 12:00"},
+    {"week": 2, "user": "Louis", "game": "New York Giants @ Dallas Cowboys", "spread": -4.0, "pick": "New York Giants", "timestamp": "2025-08-08 12:01"},
+    {"week": 2, "user": "Miles", "game": "New York Giants @ Dallas Cowboys", "spread": -4.0, "pick": "Dallas Cowboys", "timestamp": "2025-08-08 12:02"},
+    {"week": 2, "user": "Jack", "game": "Philadelphia Eagles @ Washington Commanders", "spread": 2.5, "pick": "Washington Commanders", "timestamp": "2025-08-08 12:03"},
+    {"week": 2, "user": "Louis", "game": "Philadelphia Eagles @ Washington Commanders", "spread": 2.5, "pick": "Philadelphia Eagles", "timestamp": "2025-08-08 12:04"},
+    {"week": 2, "user": "Miles", "game": "Philadelphia Eagles @ Washington Commanders", "spread": 2.5, "pick": "Philadelphia Eagles", "timestamp": "2025-08-08 12:05"},
     # Week 3
-    {"week": 3, "user": "Jack", "game": "Los Angeles Rams @ Minnesota Vikings", "spread": 3.5, "pick": "Los Angeles Rams", "timestamp": "2025-08-15 12:00"},
-    {"week": 3, "user": "Louis", "game": "Los Angeles Rams @ Minnesota Vikings", "spread": 3.5, "pick": "Minnesota Vikings", "timestamp": "2025-08-15 12:01"},
-    {"week": 3, "user": "Miles", "game": "Los Angeles Rams @ Minnesota Vikings", "spread": 3.5, "pick": "Los Angeles Rams", "timestamp": "2025-08-15 12:02"},
-    {"week": 3, "user": "Jack", "game": "Seattle Seahawks @ Arizona Cardinals", "spread": -1.5, "pick": "Arizona Cardinals", "timestamp": "2025-08-15 12:03"},
-    {"week": 3, "user": "Louis", "game": "Seattle Seahawks @ Arizona Cardinals", "spread": -1.5, "pick": "Seattle Seahawks", "timestamp": "2025-08-15 12:04"},
-    {"week": 3, "user": "Miles", "game": "Seattle Seahawks @ Arizona Cardinals", "spread": -1.5, "pick": "Arizona Cardinals", "timestamp": "2025-08-15 12:05"},
+    {"week": 3, "user": "Jack", "game": "Los Angeles Rams @ Minnesota Vikings", "spread": -3.5, "pick": "Los Angeles Rams", "timestamp": "2025-08-15 12:00"},
+    {"week": 3, "user": "Louis", "game": "Los Angeles Rams @ Minnesota Vikings", "spread": -3.5, "pick": "Minnesota Vikings", "timestamp": "2025-08-15 12:01"},
+    {"week": 3, "user": "Miles", "game": "Los Angeles Rams @ Minnesota Vikings", "spread": -3.5, "pick": "Los Angeles Rams", "timestamp": "2025-08-15 12:02"},
+    {"week": 3, "user": "Jack", "game": "Seattle Seahawks @ Arizona Cardinals", "spread": 1.5, "pick": "Arizona Cardinals", "timestamp": "2025-08-15 12:03"},
+    {"week": 3, "user": "Louis", "game": "Seattle Seahawks @ Arizona Cardinals", "spread": 1.5, "pick": "Seattle Seahawks", "timestamp": "2025-08-15 12:04"},
+    {"week": 3, "user": "Miles", "game": "Seattle Seahawks @ Arizona Cardinals", "spread": 1.5, "pick": "Arizona Cardinals", "timestamp": "2025-08-15 12:05"},
     ]
 
     demo_results = [
@@ -771,8 +774,8 @@ def render_demo_mode():
         st.write("View everyone's picks for games that have started:")
         
         demo_games = [
-            {"game": "Minnesota Vikings @ Chicago Bears", "spread": -3.0, "commence_time": "2025-09-08T17:00:00Z"},
-            {"game": "New England Patriots @ New York Jets", "spread": -1.5, "commence_time": "2025-09-08T20:00:00Z"}
+            {"game": "Minnesota Vikings @ Chicago Bears", "spread": 3.0, "commence_time": "2025-09-08T17:00:00Z"},
+            {"game": "New England Patriots @ New York Jets", "spread": 1.5, "commence_time": "2025-09-08T20:00:00Z"}
         ]
         
         for game in demo_games:
