@@ -67,5 +67,39 @@ class TestNFLDataLive(unittest.TestCase):
         except Exception as e:
             self.fail(f"Test failed with error: {str(e)}")
 
+class TestLiveAPI(unittest.TestCase):
+    def setUp(self):
+        self.api = OddsAPI()
+        self.test_data_dir = Path("test_data")
+        self.test_data_dir.mkdir(exist_ok=True)
+
+    def test_scores_format(self):
+        """Test that game scores are properly formatted"""
+        scores = self.api.get_game_scores()
+        
+        # Save raw response for inspection
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filepath = self.test_data_dir / f"scores_response_{timestamp}.json"
+        with open(filepath, "w") as f:
+            json.dump(scores, f, indent=2)
+            
+        print(f"\nFound {len(scores)} games")
+        
+        if scores:
+            for game in scores:
+                print(f"\nGame Analysis:")
+                print(f"Teams: {game['away_team']} @ {game['home_team']}")
+                print(f"Score: {game['scores_away']}-{game['scores_home']}")
+                print(f"Game Time: {game['commence_time']}")
+                print(f"Last Updated: {game['last_update']}")
+                
+                # Verify required fields
+                self.assertIn('home_team', game)
+                self.assertIn('away_team', game)
+                self.assertIn('scores_home', game)
+                self.assertIn('scores_away', game)
+                self.assertIn('completed', game)
+                self.assertIn('sport_key', game)
+
 if __name__ == '__main__':
     unittest.main()
