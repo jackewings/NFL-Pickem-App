@@ -9,8 +9,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.append(str(project_root))
 
-# Change relative import to absolute
-from src.core import data
+from src.core.data import nfl_data  # Import the singleton instance
 import logging
 
 # Set up logging
@@ -27,7 +26,7 @@ def update_spreads_and_results():
     """Update NFL spreads data from API"""
     try:
         logger.info("Starting data update...")
-        spreads = data.get_weekly_spreads_from_api(save_csv=True)
+        spreads = nfl_data.get_weekly_spreads_from_api(save_csv=True)
         
         if spreads:
             logger.info(f"Successfully updated spreads data at {datetime.now(pytz.UTC)}")
