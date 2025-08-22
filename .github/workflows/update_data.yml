@@ -2,10 +2,11 @@ name: Update NFL Data
 
 on:
   schedule:
-    # Game day updates - Every hour from 6:30 AM through 11:30 PM CT
-    - cron: '30 11-23,0 * * *'
-    # Non-game day updates - 6:30 AM, 12:30 PM, 6:30 PM CT
-    - cron: '30 11,17,22 * * *'
+    # Sunday (0), Monday (1), Thursday (4): hourly 7:30am–11:30pm CT (12:30–04:30 UTC next day)
+    - cron: '30 12-23 * * 0,1,4'   # 7:30am–5:30pm CT same day
+    - cron: '30 0-4 * * 1,2,5'     # 6:30pm–11:30pm CT previous day (UTC next day)
+    # Tuesday (2), Wednesday (3), Friday (5), Saturday (6): 6:30am, 12:30pm, 6:30pm CT (11:30, 17:30, 23:30 UTC)
+    - cron: '30 11,17,23 * * 2,3,5,6'
   workflow_dispatch:
 
 jobs:
@@ -13,69 +14,45 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-          
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pandas requests pytz streamlit
-          
-      - name: Check if game day and get time
+
+      - name: Check if game day
         id: check-schedule
         env:
           API_KEY: ${{ secrets.API_KEY }}
         run: |
-          # Get current time in CT
-          HOUR=$(TZ=America/Chicago date +%H)
-          MIN=$(TZ=America/Chicago date +%M)
-          echo "HOUR=${HOUR}" >> $GITHUB_ENV
-          echo "MIN=${MIN}" >> $GITHUB_ENV
-          
-          # Check if game day
-          PYTHONPATH=$PYTHONPATH:$(pwd) python src/core/check_game_day.py
-          OUTPUT=$(PYTHONPATH=$PYTHONPATH:$(pwd) python src/core/check_game_day.py)
+          OUTPUT=$(python -c "from src.utils.schedule import NFLSchedule; print(str(NFLSchedule.is_game_day()).lower())")
           echo "IS_GAME_DAY=${OUTPUT}" >> $GITHUB_ENV
 
-      - name: Update data based on schedule
+      - name: Update data
         env:
           API_KEY: ${{ secrets.API_KEY }}
-        run: |
-          if [[ "$IS_GAME_DAY" == "true" ]]; then
-            # Game day - update if between 6:30 AM and 11:30 PM CT
-            if [[ "$HOUR" -ge 6 && "$HOUR" -le 23 && "$MIN" == "30" ]]; then
-              echo "Game day update at $HOUR:$MIN CT"
-              python src/core/update_data.py
-            fi
-          elif [[ "$HOUR" =~ ^(6|12|18)$ && "$MIN" == "30" ]]; then
-            # Non-game day scheduled update
-            echo "Non-game day update at $HOUR:$MIN CT"
-            python src/core/update_data.py
-          fi
+        run: python src/core/update_data.py
 
       - name: Manual update
         if: github.event_name == 'workflow_dispatch'
         env:
           API_KEY: ${{ secrets.API_KEY }}
         run: python src/core/update_data.py
-          
+
       - name: Commit and push if changed
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          # Stash any unstaged changes
           git stash -u
-          # Pull latest changes
           git pull origin main --rebase
-          # Pop stashed changes
           git stash pop || true
-          # Force add the CSV file
           git add -f data/weekly_spreads.csv
-          # Commit and push if there are changes
           git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update NFL data" && git push origin main)
