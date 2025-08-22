@@ -52,3 +52,7 @@ npm-debug.log*
 data/*
 !data/
 !data/README.md
+!data/demo_results.csv
+!data/picks.csv
+!data/weekly_spreads.csv
+!data/results.csv
