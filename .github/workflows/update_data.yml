@@ -3,8 +3,8 @@ name: Update NFL Data
 on:
   schedule:
     # Sunday (0), Monday (1), Thursday (4): hourly 7:30am–11:30pm CT (12:30–04:30 UTC next day)
-    - cron: '30 12-23 * * 0,1,4'   # 7:30am–5:30pm CT same day
-    - cron: '30 0-4 * * 1,2,5'     # 6:30pm–11:30pm CT previous day (UTC next day)
+    - cron: '30 12-23 * * 0,1,4'
+    - cron: '30 0-4 * * 1,2,5'
     # Tuesday (2), Wednesday (3), Friday (5), Saturday (6): 6:30am, 12:30pm, 6:30pm CT (11:30, 17:30, 23:30 UTC)
     - cron: '30 11,17,23 * * 2,3,5,6'
   workflow_dispatch:
@@ -27,14 +27,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pandas requests pytz streamlit
-
-      - name: Check if game day
-        id: check-schedule
-        env:
-          API_KEY: ${{ secrets.API_KEY }}
-        run: |
-          OUTPUT=$(python -c "from src.utils.schedule import NFLSchedule; print(str(NFLSchedule.is_game_day()).lower())")
-          echo "IS_GAME_DAY=${OUTPUT}" >> $GITHUB_ENV
 
       - name: Update data
         env:
