@@ -1,18 +1,9 @@
-# Streamlit secrets (local only)
-.streamlit/
-
-# Data files
-data/*
-!data/
-!data/weekly_spreads.csv
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -28,6 +19,8 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Testing
 .pytest_cache/
 .coverage
 htmlcov/
@@ -38,27 +31,24 @@ ENV/
 .env
 .venv
 .env.local
-venv/
-ENV/
 
-# IDE specific files
+# IDE specific
 .idea/
 .vscode/
 *.swp
 *.swo
 .DS_Store
-.env.local
 
 # Logs
 *.log
 logs/
 npm-debug.log*
 
-# Testing
-.coverage
-.pytest_cache/
-htmlcov/
+# Streamlit
+.streamlit/
+!.streamlit/config.toml
 
-# Project specific
-data/*.csv
-.streamlit/secrets.toml
+# Project specific data
+data/*
+!data/
+!data/README.md
