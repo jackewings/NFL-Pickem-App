@@ -202,6 +202,34 @@ def render_make_picks_tab(user, picks_df, weekly_games):
                     "pick": selected_full,
                     "timestamp": datetime.now().isoformat(timespec="seconds")
                 })
+        
+        # Add Submit/Reset buttons
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Submit Picks"):
+                new_picks_df = pd.concat([
+                    picks_df[~((picks_df["week"] == CURRENT_WEEK) & (picks_df["user"] == user))],
+                    pd.DataFrame(session_picks)
+                ], ignore_index=True)
+                save_picks(new_picks_df)
+                st.success("✅ Picks submitted successfully!")
+                st.rerun()
+        
+        with col2:
+            if not st.session_state.show_reset_confirm:
+                if st.button("Reset Picks"):
+                    st.session_state.show_reset_confirm = True
+                    st.rerun()
+            else:
+                if st.button("Confirm Reset"):
+                    new_picks_df = picks_df[~((picks_df["week"] == CURRENT_WEEK) & (picks_df["user"] == user))]
+                    save_picks(new_picks_df)
+                    st.session_state.show_reset_confirm = False
+                    st.success("🔄 Picks reset successfully!")
+                    st.rerun()
+                if st.button("Cancel"):
+                    st.session_state.show_reset_confirm = False
+                    st.rerun()
 
     st.subheader("Your Picks This Week")
     current_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == CURRENT_WEEK)]
