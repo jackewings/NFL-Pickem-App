@@ -2,7 +2,15 @@ import pandas as pd
 from pathlib import Path
 from datetime import datetime
 import pytz
-from . import data
+import sys
+from pathlib import Path
+
+# Add project root to Python path for imports
+project_root = Path(__file__).parent.parent.parent
+sys.path.append(str(project_root))
+
+# Change relative import to absolute
+from src.core import data
 import logging
 
 # Set up logging
