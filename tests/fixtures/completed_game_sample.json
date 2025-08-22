@@ -1,0 +1,22 @@
+[
+  {
+    "id": "c252e5fbf3dc34ac07c52da58e8b3e74",
+    "sport_key": "americanfootball_nfl",
+    "sport_title": "NFL",
+    "commence_time": "2025-08-21T00:20:00Z",
+    "completed": true,
+    "home_team": "Philadelphia Eagles", 
+    "away_team": "Dallas Cowboys",
+    "scores": [
+      {
+        "name": "Philadelphia Eagles",
+        "score": "27"
+      },
+      {
+        "name": "Dallas Cowboys",
+        "score": "20"
+      }
+    ],
+    "last_update": "2025-08-22T03:45:00Z"
+  }
+]
