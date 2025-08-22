@@ -634,38 +634,31 @@ def main():
 
 def render_live_mode():
     """Render the live mode content"""
-    # User authentication
     if "user" not in st.session_state:
         st.session_state.user = None
     if "user_authenticated" not in st.session_state:
         st.session_state.user_authenticated = False
 
-    if not st.session_state.user:
-        user = st.selectbox("Select your name:", USERS)
-        if st.button("Next"):
-            st.session_state.user = user
-            st.rerun()
-        st.stop()
-
-    user = st.session_state.user
-
+    # Direct password entry without user selection first
     if not st.session_state.user_authenticated:
-        pw = st.text_input(f"Enter password for {user}:", type="password")
-        if st.button("Unlock My Picks"):
-            if pw == st.secrets["users"][user]:
-                st.session_state.user_authenticated = True
-                st.rerun()
-            else:
-                st.warning("❌ Incorrect password")
+        pw = st.text_input("Enter your user password:", type="password")
+        if st.button("Login"):
+            # Check password against all users
+            for username, password in st.secrets["users"].items():
+                if pw == password:
+                    st.session_state.user = username
+                    st.session_state.user_authenticated = True
+                    st.rerun()
+                    break
+            else:  # No matching password found
+                st.error("❌ Invalid password")
                 st.stop()
         st.stop()
 
     # Only shown after successful authentication
+    user = st.session_state.user
     tabs = st.tabs(["Make Picks", "Past Picks", "Group Picks", "Group Data", "Leaderboards"])
     picks_df = load_picks()
-    if results_available:
-        results_df = pd.read_csv(RESULTS_FILE)  # Use real results
-        scores = scoring.calculate_scores(picks_df, results_df)
 
     # Render each tab
     with tabs[0]:
