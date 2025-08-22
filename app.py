@@ -904,9 +904,6 @@ def render_demo_mode():
     with demo_tabs[4]:
         st.header("Leaderboards")
         
-        # Calculate demo scores first
-        demo_scores = scoring.calculate_scores(demo_df, demo_results_df)
-        
         # Weekly Leaderboard
         st.subheader("🏆 Weekly Leaderboard")
         if not demo_scores.weekly.empty:
@@ -916,37 +913,48 @@ def render_demo_mode():
             weekly_filtered = demo_scores.weekly[demo_scores.weekly["week"] == selected_week]
             weekly_ranked = add_rank(weekly_filtered, ["correct", "correct_pct"])
             
-            weekly_ranked["correct_pct"] = weekly_ranked["correct_pct"].apply(lambda x: f"{x:.1f}")
+            # Format percentage and prepare dataframe
+            weekly_ranked["correct_pct"] = weekly_ranked["correct_pct"].apply(lambda x: f"{x:.1f}%")
+            weekly_display = weekly_ranked.rename(columns={
+                "user": "User",
+                "week": "Week",
+                "correct": "Correct Picks",  # Shortened name
+                "correct_pct": "Correct Pick %",   # Shortened name
+                "Rank": "#"          # Shortened name
+            })
+            weekly_display.set_index("#", inplace=True)
             
-            st.table(
-                weekly_ranked.rename(columns={
-                    "user": "User",
-                    "week": "Week",
-                    "correct": "Correct Picks",
-                    "correct_pct": "Correct Pick %",
-                    "Rank": "Rank"
-                })[["Rank", "User", "Week", "Correct Picks", "Correct Pick %"]]
+            # Display with custom width
+            st.dataframe(
+                weekly_display[["User", "Week", "Correct Picks", "Correct Pick %"]],
+                use_container_width=True
             )
         
         # Total Leaderboard
-        st.subheader("🏆 Season Total Leaderboard")
+        st.subheader("🏆 Season Totals Leaderboard")
         if not demo_scores.total.empty:
             total_ranked = add_rank(demo_scores.total, ["correct", "correct_pct"])
-            total_ranked["correct_pct"] = total_ranked["correct_pct"].apply(lambda x: f"{x:.1f}")
-            # Convert best team to display name
+            total_ranked["correct_pct"] = total_ranked["correct_pct"].apply(lambda x: f"{x:.1f}%")
+            
+            # Convert best team to display name if present
             if "best_team" in total_ranked.columns:
                 total_ranked["best_team"] = total_ranked["best_team"].apply(
-                    lambda x: TEAM_DISPLAY_NAMES.get(x, x) if pd.notnull(x) else "N/A"
+                    lambda x: TEAM_DISPLAY_NAMES.get(x, x) if pd.notnull(x) else "-"
                 )
             
-            st.table(
-                total_ranked.rename(columns={
-                    "user": "User",
-                    "correct": "Correct Picks",
-                    "correct_pct": "Correct Pick %",
-                    "best_team": "Best Team",
-                    "Rank": "Rank"
-                })[["Rank", "User", "Correct Picks", "Correct Pick %", "Best Team"]]
+            # Prepare display dataframe
+            total_display = total_ranked.rename(columns={
+                "user": "User",
+                "correct": "Correct Picks",
+                "correct_pct": "Correct Pick %",
+                "best_team": "Best Team",
+                "Rank": "#"
+            })
+            total_display.set_index("#", inplace=True)
+            
+            st.dataframe(
+                total_display[["User", "Correct Picks", "Correct Pick %", "Best Team"]],
+                use_container_width=True
             )
 
 if __name__ == "__main__":
