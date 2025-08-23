@@ -1,9 +1,52 @@
 from datetime import datetime
-from typing import Dict, Tuple, Optional
-import pytz
+from typing import List, Dict, Optional, Tuple
+import requests
 import logging
+import os
+import pytz
+from src.config.settings import TIMEZONES, API_BASE_URL, API_ENDPOINTS
 
 logger = logging.getLogger(__name__)
+
+class NFLSchedule:
+    """Handles NFL schedule related operations"""
+    
+    @staticmethod
+    def is_game_day() -> bool:
+        """Check if there are any NFL games today"""
+        try:
+            api_key = os.getenv('API_KEY')
+            if not api_key:
+                logger.error("No API key found")
+                return False
+
+            # Get current date in ET (NFL's timezone)
+            today = datetime.now(TIMEZONES['ET']).date()
+            
+            url = f"{API_BASE_URL}{API_ENDPOINTS['scores']}"
+            params = {
+                "apiKey": api_key,
+                "daysFrom": 0,
+                "daysTo": 0
+            }
+            
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            games = response.json()
+            
+            has_games = any(
+                datetime.fromisoformat(game['commence_time'].replace('Z', '+00:00'))
+                .astimezone(TIMEZONES['ET'])
+                .date() == today
+                for game in games
+            )
+            
+            logger.info(f"Game day check: {'Yes' if has_games else 'No'} games today")
+            return has_games
+            
+        except Exception as e:
+            logger.error(f"Error checking game day: {str(e)}")
+            return False
 
 # NFL season schedule mapping (start_date, end_date) for each week
 NFL_WEEKS: Dict[int, Tuple[str, str]] = {

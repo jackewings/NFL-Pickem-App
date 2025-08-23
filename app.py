@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime
 import plotly.graph_objects as go
 from pathlib import Path
+import json
 
 from src.core.data import nfl_data
 from src.core import scoring
@@ -15,6 +16,20 @@ from src.config.settings import (
     TEAM_DISPLAY_NAMES
 )
 from src.utils.time_utils import format_display_time
+
+# Write credentials from secrets to a temp file
+with open("gcp_service_account.json", "w") as f:
+    json.dump(dict(st.secrets["gcp_service_account"]), f)
+
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+scope = [
+    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/drive"
+]
+creds = ServiceAccountCredentials.from_json_keyfile_name("gcp_service_account.json", scope)
+client = gspread.authorize(creds)
 
 # Initialize session state variables
 if "mode" not in st.session_state:
@@ -47,21 +62,25 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def load_picks():
-    """Load picks from CSV file"""
-    empty_df = pd.DataFrame(columns=["week", "user", "game", "spread", "pick", "timestamp"])
-    
-    if not PICKS_FILE.exists():
-        return empty_df
-        
+    """Load picks from Google Sheet"""
     try:
-        df = pd.read_csv(PICKS_FILE)
-        return df if not df.empty else empty_df
-    except pd.errors.EmptyDataError:
-        return empty_df
+        sheet = client.open("NFL-Pickem-Picks").worksheet("Sheet1")  
+        data = sheet.get_all_records()
+        if not data:
+            return pd.DataFrame(columns=["week", "user", "game", "spread", "pick", "timestamp"])
+        return pd.DataFrame(data)
+    except Exception as e:
+        st.error(f"Error loading picks from Google Sheets: {e}")
+        return pd.DataFrame(columns=["week", "user", "game", "spread", "pick", "timestamp"])
 
 def save_picks(df: pd.DataFrame):
-    """Save picks to CSV file"""
-    df.to_csv(PICKS_FILE, index=False)
+    """Save picks to Google Sheet"""
+    try:
+        sheet = client.open("NFL-Pickem-Picks").worksheet("Sheet1")  
+        sheet.clear()
+        sheet.update([df.columns.values.tolist()] + df.values.tolist())
+    except Exception as e:
+        st.error(f"Error saving picks to Google Sheets: {e}")
 
 def add_rank(df, sort_cols, rank_col="Rank"):
     """Add ranking column to DataFrame with proper sorting"""

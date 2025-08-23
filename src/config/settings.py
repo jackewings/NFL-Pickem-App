@@ -1,5 +1,11 @@
 from pathlib import Path
 from typing import Dict, Any
+import pytz
+
+API_ENDPOINTS = {
+    "scores": "/sports/americanfootball_nfl/scores"
+    }
+
 
 # Project paths
 BASE_DIR = Path(__file__).parent.parent.parent
@@ -20,6 +26,12 @@ ODDS_FORMAT = "decimal"
 
 # Time settings
 TIMEZONE = "America/Chicago"
+TIMEZONES = {
+    "ET": pytz.timezone("US/Eastern"),
+    "CT": pytz.timezone("US/Central"),
+    "MT": pytz.timezone("US/Mountain"),
+    "PT": pytz.timezone("US/Pacific"),
+}
 DATE_FORMAT = "%Y-%m-%d"
 DATETIME_FORMAT = "%Y-%m-%d %I:%M %p %Z"
 
