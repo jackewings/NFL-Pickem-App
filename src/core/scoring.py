@@ -135,3 +135,58 @@ def calculate_scores(picks_df: pd.DataFrame,
     except Exception as e:
         logger.error(f"Error in score calculation: {str(e)}")
         return empty_result
+    
+def score_user_pick(pick_row, results_df):
+    """
+    Given a user's pick row and the results DataFrame,
+    return 'correct', 'incorrect', or 'push' based on the user's spread.
+    """
+    # Find the final result for this game
+    result_row = results_df[
+        (results_df["week"] == pick_row["week"]) &
+        (results_df["game"] == pick_row["game"])
+    ]
+    if result_row.empty:
+        return None  # No result yet
+
+    # You may need to adjust these column names based on your results.csv
+    # Let's assume you have columns: 'home_score', 'away_score', 'game'
+    home_team = pick_row["game"].split(" @ ")[1]
+    away_team = pick_row["game"].split(" @ ")[0]
+    home_score = result_row.iloc[0].get("home_score")
+    away_score = result_row.iloc[0].get("away_score")
+    spread = float(pick_row["spread"])
+    pick = pick_row["pick"]
+
+    # If scores are missing, can't score
+    if home_score is None or away_score is None:
+        return None
+
+    # Calculate margin
+    margin = home_score - away_score
+
+    # Determine which team covered the spread
+    # Negative spread: home favorite; Positive: home underdog
+    if spread < 0:
+        # Home is favorite, so Chiefs (-2.5) means home_team must win by more than 2.5
+        covered = home_team if margin > abs(spread) else away_team
+    else:
+        # Home is underdog, so home_team +2.5 means home_team must lose by less than 2.5 or win
+        covered = home_team if margin > spread else away_team
+
+    # Push logic
+    if abs(margin) == abs(spread):
+        return "push"
+    elif pick == covered:
+        return "correct"
+    else:
+        return "incorrect"
+    
+def score_all_picks(picks_df: pd.DataFrame, results_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Add a 'result' column to picks_df with 'correct', 'incorrect', or 'push'
+    using each user's submitted spread and the final game score.
+    """
+    picks_df = picks_df.copy()
+    picks_df["result"] = picks_df.apply(lambda row: score_user_pick(row, results_df), axis=1)
+    return picks_df
