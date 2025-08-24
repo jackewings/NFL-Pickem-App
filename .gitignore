@@ -56,3 +56,5 @@ data/*
 !data/picks.csv
 !data/weekly_spreads.csv
 !data/results.csv
+
+gcp_service_account.json
