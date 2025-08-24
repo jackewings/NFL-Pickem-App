@@ -1,3 +1,6 @@
+import sys
+sys.path.append(str(Path(__file__).parent))
+
 import streamlit as st
 import pandas as pd
 from datetime import datetime
