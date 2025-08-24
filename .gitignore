@@ -56,5 +56,7 @@ data/*
 !data/picks.csv
 !data/weekly_spreads.csv
 !data/results.csv
+!data/demo_picks.csv
+!data/demo_results.csv
 
 gcp_service_account.json
