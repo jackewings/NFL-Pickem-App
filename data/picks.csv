@@ -1,17 +1,20 @@
 week,user,game,spread,pick,timestamp
-1,Jack,Dallas Cowboys @ Philadelphia Eagles,-7.0,Dallas Cowboys,2025-08-21T19:49:36
-1,Jack,Kansas City Chiefs @ Los Angeles Chargers,3.0,Kansas City Chiefs,2025-08-21T19:49:36
-1,Jack,Tampa Bay Buccaneers @ Atlanta Falcons,1.5,Tampa Bay Buccaneers,2025-08-21T19:49:36
-1,Jack,Carolina Panthers @ Jacksonville Jaguars,-3.0,Carolina Panthers,2025-08-21T19:49:36
-1,Jack,New York Giants @ Washington Commanders,-6.0,New York Giants,2025-08-21T19:49:36
-1,Jack,Arizona Cardinals @ New Orleans Saints,6.0,Arizona Cardinals,2025-08-21T19:49:36
-1,Jack,Cincinnati Bengals @ Cleveland Browns,5.5,Cincinnati Bengals,2025-08-21T19:49:36
-1,Jack,Miami Dolphins @ Indianapolis Colts,-1.5,Miami Dolphins,2025-08-21T19:49:36
-1,Jack,Las Vegas Raiders @ New England Patriots,-3.0,Las Vegas Raiders,2025-08-21T19:49:36
-1,Jack,Pittsburgh Steelers @ New York Jets,3.0,Pittsburgh Steelers,2025-08-21T19:49:36
-1,Jack,Tennessee Titans @ Denver Broncos,-7.5,Tennessee Titans,2025-08-21T19:49:36
-1,Jack,San Francisco 49ers @ Seattle Seahawks,2.5,San Francisco 49ers,2025-08-21T19:49:36
-1,Jack,Detroit Lions @ Green Bay Packers,-1.5,Detroit Lions,2025-08-21T19:49:36
-1,Jack,Houston Texans @ Los Angeles Rams,-2.5,Houston Texans,2025-08-21T19:49:36
-1,Jack,Baltimore Ravens @ Buffalo Bills,-1.5,Baltimore Ravens,2025-08-21T19:49:36
-1,Jack,Minnesota Vikings @ Chicago Bears,1.5,Minnesota Vikings,2025-08-21T19:49:36
+1,Jack,Minnesota Vikings @ Chicago Bears,3.0,Chicago Bears,2025-08-01 12:00
+1,Louis,Minnesota Vikings @ Chicago Bears,3.0,Minnesota Vikings,2025-08-01 12:01
+1,Miles,Minnesota Vikings @ Chicago Bears,3.0,Minnesota Vikings,2025-08-01 12:02
+1,Jack,New England Patriots @ New York Jets,1.5,New York Jets,2025-08-01 12:03
+1,Louis,New England Patriots @ New York Jets,1.5,New York Jets,2025-08-01 12:04
+1,Miles,New England Patriots @ New York Jets,1.5,New England Patriots,2025-08-01 12:05
+2,Jack,New York Giants @ Dallas Cowboys,-4.0,New York Giants,2025-08-08 12:00
+2,Louis,New York Giants @ Dallas Cowboys,-4.0,New York Giants,2025-08-08 12:01
+2,Miles,New York Giants @ Dallas Cowboys,-4.0,Dallas Cowboys,2025-08-08 12:02
+2,Jack,Philadelphia Eagles @ Washington Commanders,2.5,Washington Commanders,2025-08-08 12:03
+2,Louis,Philadelphia Eagles @ Washington Commanders,2.5,Philadelphia Eagles,2025-08-08 12:04
+2,Miles,Philadelphia Eagles @ Washington Commanders,2.5,Philadelphia Eagles,2025-08-08 12:05
+3,Jack,Los Angeles Rams @ Minnesota Vikings,-3.5,Los Angeles Rams,2025-08-15 12:00
+3,Louis,Los Angeles Rams @ Minnesota Vikings,-3.5,Minnesota Vikings,2025-08-15 12:01
+3,Miles,Los Angeles Rams @ Minnesota Vikings,-3.5,Los Angeles Rams,2025-08-15 12:02
+3,Jack,Seattle Seahawks @ Arizona Cardinals,1.5,Arizona Cardinals,2025-08-15 12:03
+3,Louis,Seattle Seahawks @ Arizona Cardinals,1.5,Seattle Seahawks,2025-08-15 12:04
+3,Miles,Seattle Seahawks @ Arizona Cardinals,1.5,Arizona Cardinals,2025-08-15 12:05
+
