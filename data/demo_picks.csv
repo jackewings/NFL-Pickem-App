@@ -8,24 +8,24 @@ week,user,game,spread,pick,timestamp,correct
 1,Louis,Carolina Panthers @ Chicago Bears,-1.5,Chicago Bears,2025-08-01 12:06,1
 1,Miles,Carolina Panthers @ Chicago Bears,-1.5,Chicago Bears,2025-08-01 12:07,1
 1,Jack,Carolina Panthers @ Chicago Bears,-1.5,Carolina Panthers,2025-08-01 12:08,0
-1,Louis,Cincinnati Bengals @ Cleveland Browns,-4.0,Cincinnati Bengals,2025-08-01 12:09,1
-1,Miles,Cincinnati Bengals @ Cleveland Browns,-4.0,Cleveland Browns,2025-08-01 12:10,1
-1,Jack,Cincinnati Bengals @ Cleveland Browns,-4.0,Cincinnati Bengals,2025-08-01 12:11,0
+1,Louis,Cincinnati Bengals @ Cleveland Browns,4.0,Cincinnati Bengals,2025-08-01 12:09,1
+1,Miles,Cincinnati Bengals @ Cleveland Browns,4.0,Cleveland Browns,2025-08-01 12:10,1
+1,Jack,Cincinnati Bengals @ Cleveland Browns,4.0,Cincinnati Bengals,2025-08-01 12:11,0
 1,Louis,Dallas Cowboys @ Denver Broncos,2.5,Dallas Cowboys,2025-08-01 12:12,1
 1,Miles,Dallas Cowboys @ Denver Broncos,2.5,Denver Broncos,2025-08-01 12:13,0
 1,Jack,Dallas Cowboys @ Denver Broncos,2.5,Dallas Cowboys,2025-08-01 12:14,1
-1,Louis,Detroit Lions @ Green Bay Packers,-3.5,Green Bay Packers,2025-08-01 12:15,1
-1,Miles,Detroit Lions @ Green Bay Packers,-3.5,Green Bay Packers,2025-08-01 12:16,1
-1,Jack,Detroit Lions @ Green Bay Packers,-3.5,Detroit Lions,2025-08-01 12:17,0
+1,Louis,Detroit Lions @ Green Bay Packers,-1.5,Green Bay Packers,2025-08-01 12:15,1
+1,Miles,Detroit Lions @ Green Bay Packers,-1.5,Green Bay Packers,2025-08-01 12:16,1
+1,Jack,Detroit Lions @ Green Bay Packers,-1.5,Detroit Lions,2025-08-01 12:17,0
 1,Louis,Houston Texans @ Indianapolis Colts,1.0,Houston Texans,2025-08-01 12:18,1
 1,Miles,Houston Texans @ Indianapolis Colts,1.0,Houston Texans,2025-08-01 12:19,0
 1,Jack,Houston Texans @ Indianapolis Colts,1.0,Indianapolis Colts,2025-08-01 12:20,1
 1,Louis,Jacksonville Jaguars @ Kansas City Chiefs,-2.5,Jacksonville Jaguars,2025-08-01 12:21,1
 1,Miles,Jacksonville Jaguars @ Kansas City Chiefs,-2.5,Kansas City Chiefs,2025-08-01 12:22,1
 1,Jack,Jacksonville Jaguars @ Kansas City Chiefs,-2.5,Jacksonville Jaguars,2025-08-01 12:23,0
-1,Louis,Las Vegas Raiders @ Los Angeles Chargers,3.5,Los Angeles Chargers,2025-08-01 12:24,1
-1,Miles,Las Vegas Raiders @ Los Angeles Chargers,3.5,Las Vegas Raiders,2025-08-01 12:25,0
-1,Jack,Las Vegas Raiders @ Los Angeles Chargers,3.5,Las Vegas Raiders,2025-08-01 12:26,1
+1,Louis,Las Vegas Raiders @ Los Angeles Chargers,-3.5,Los Angeles Chargers,2025-08-01 12:24,1
+1,Miles,Las Vegas Raiders @ Los Angeles Chargers,-3.5,Las Vegas Raiders,2025-08-01 12:25,0
+1,Jack,Las Vegas Raiders @ Los Angeles Chargers,-3.5,Las Vegas Raiders,2025-08-01 12:26,1
 1,Louis,Los Angeles Rams @ Miami Dolphins,-1.0,Los Angeles Rams,2025-08-01 12:27,1
 1,Miles,Los Angeles Rams @ Miami Dolphins,-1.0,Los Angeles Rams,2025-08-01 12:28,1
 1,Jack,Los Angeles Rams @ Miami Dolphins,-1.0,Miami Dolphins,2025-08-01 12:29,0
@@ -35,42 +35,42 @@ week,user,game,spread,pick,timestamp,correct
 1,Louis,New Orleans Saints @ New York Giants,-2.5,New York Giants,2025-08-01 12:33,1
 1,Miles,New Orleans Saints @ New York Giants,-2.5,New York Giants,2025-08-01 12:34,0
 1,Jack,New Orleans Saints @ New York Giants,-2.5,New Orleans Saints,2025-08-01 12:35,1
-1,Louis,New York Jets @ Philadelphia Eagles,1.5,Philadelphia Eagles,2025-08-01 12:36,1
-1,Miles,New York Jets @ Philadelphia Eagles,1.5,Philadelphia Eagles,2025-08-01 12:37,1
-1,Jack,New York Jets @ Philadelphia Eagles,1.5,New York Jets,2025-08-01 12:38,0
+1,Louis,New York Jets @ Philadelphia Eagles,-7.5,Philadelphia Eagles,2025-08-01 12:36,1
+1,Miles,New York Jets @ Philadelphia Eagles,-7.5,Philadelphia Eagles,2025-08-01 12:37,1
+1,Jack,New York Jets @ Philadelphia Eagles,-7.5,New York Jets,2025-08-01 12:38,0
 1,Louis,Pittsburgh Steelers @ San Francisco 49ers,-3.0,Pittsburgh Steelers,2025-08-01 12:39,1
 1,Miles,Pittsburgh Steelers @ San Francisco 49ers,-3.0,San Francisco 49ers,2025-08-01 12:40,0
 1,Jack,Pittsburgh Steelers @ San Francisco 49ers,-3.0,Pittsburgh Steelers,2025-08-01 12:41,1
 1,Louis,Seattle Seahawks @ Tampa Bay Buccaneers,2.5,Seattle Seahawks,2025-08-01 12:42,1
 1,Miles,Seattle Seahawks @ Tampa Bay Buccaneers,2.5,Tampa Bay Buccaneers,2025-08-01 12:43,0
 1,Jack,Seattle Seahawks @ Tampa Bay Buccaneers,2.5,Seattle Seahawks,2025-08-01 12:44,1
-1,Louis,Tennessee Titans @ Washington Commanders,-1.0,Tennessee Titans,2025-08-01 12:45,1
-1,Miles,Tennessee Titans @ Washington Commanders,-1.0,Washington Commanders,2025-08-01 12:46,0
-1,Jack,Tennessee Titans @ Washington Commanders,-1.0,Tennessee Titans,2025-08-01 12:47,1
-2,Louis,Atlanta Falcons @ Baltimore Ravens,3.0,Atlanta Falcons,2025-08-08 12:00,1
-2,Miles,Atlanta Falcons @ Baltimore Ravens,3.0,Baltimore Ravens,2025-08-08 12:01,0
-2,Jack,Atlanta Falcons @ Baltimore Ravens,3.0,Atlanta Falcons,2025-08-08 12:02,1
-2,Louis,Buffalo Bills @ Carolina Panthers,-2.5,Buffalo Bills,2025-08-08 12:03,1
-2,Miles,Buffalo Bills @ Carolina Panthers,-2.5,Carolina Panthers,2025-08-08 12:04,0
-2,Jack,Buffalo Bills @ Carolina Panthers,-2.5,Buffalo Bills,2025-08-08 12:05,1
-2,Louis,Chicago Bears @ Cincinnati Bengals,1.5,Cincinnati Bengals,2025-08-08 12:06,1
-2,Miles,Chicago Bears @ Cincinnati Bengals,1.5,Cincinnati Bengals,2025-08-08 12:07,1
-2,Jack,Chicago Bears @ Cincinnati Bengals,1.5,Chicago Bears,2025-08-08 12:08,0
+1,Louis,Tennessee Titans @ Washington Commanders,-8.0,Tennessee Titans,2025-08-01 12:45,1
+1,Miles,Tennessee Titans @ Washington Commanders,-8.0,Washington Commanders,2025-08-01 12:46,0
+1,Jack,Tennessee Titans @ Washington Commanders,-8.0,Tennessee Titans,2025-08-01 12:47,1
+2,Louis,Atlanta Falcons @ Baltimore Ravens,-3.0,Atlanta Falcons,2025-08-08 12:00,1
+2,Miles,Atlanta Falcons @ Baltimore Ravens,-3.0,Baltimore Ravens,2025-08-08 12:01,0
+2,Jack,Atlanta Falcons @ Baltimore Ravens,-3.0,Atlanta Falcons,2025-08-08 12:02,1
+2,Louis,Buffalo Bills @ Carolina Panthers,6.5,Buffalo Bills,2025-08-08 12:03,1
+2,Miles,Buffalo Bills @ Carolina Panthers,6.5,Carolina Panthers,2025-08-08 12:04,0
+2,Jack,Buffalo Bills @ Carolina Panthers,6.5,Buffalo Bills,2025-08-08 12:05,1
+2,Louis,Chicago Bears @ Cincinnati Bengals,-1.5,Cincinnati Bengals,2025-08-08 12:06,1
+2,Miles,Chicago Bears @ Cincinnati Bengals,-1.5,Cincinnati Bengals,2025-08-08 12:07,1
+2,Jack,Chicago Bears @ Cincinnati Bengals,-1.5,Chicago Bears,2025-08-08 12:08,0
 2,Louis,Cleveland Browns @ Dallas Cowboys,-3.0,Dallas Cowboys,2025-08-08 12:09,1
 2,Miles,Cleveland Browns @ Dallas Cowboys,-3.0,Dallas Cowboys,2025-08-08 12:10,1
 2,Jack,Cleveland Browns @ Dallas Cowboys,-3.0,Cleveland Browns,2025-08-08 12:11,0
-2,Louis,Denver Broncos @ Detroit Lions,2.5,Detroit Lions,2025-08-08 12:12,1
-2,Miles,Denver Broncos @ Detroit Lions,2.5,Detroit Lions,2025-08-08 12:13,1
-2,Jack,Denver Broncos @ Detroit Lions,2.5,Denver Broncos,2025-08-08 12:14,0
-2,Louis,Green Bay Packers @ Houston Texans,-1.5,Houston Texans,2025-08-08 12:15,1
-2,Miles,Green Bay Packers @ Houston Texans,-1.5,Houston Texans,2025-08-08 12:16,1
-2,Jack,Green Bay Packers @ Houston Texans,-1.5,Green Bay Packers,2025-08-08 12:17,0
+2,Louis,Denver Broncos @ Detroit Lions,-2.5,Detroit Lions,2025-08-08 12:12,1
+2,Miles,Denver Broncos @ Detroit Lions,-2.5,Detroit Lions,2025-08-08 12:13,1
+2,Jack,Denver Broncos @ Detroit Lions,-2.5,Denver Broncos,2025-08-08 12:14,0
+2,Louis,Green Bay Packers @ Houston Texans,1.5,Houston Texans,2025-08-08 12:15,1
+2,Miles,Green Bay Packers @ Houston Texans,1.5,Houston Texans,2025-08-08 12:16,1
+2,Jack,Green Bay Packers @ Houston Texans,1.5,Green Bay Packers,2025-08-08 12:17,0
 2,Louis,Indianapolis Colts @ Jacksonville Jaguars,2.0,Jacksonville Jaguars,2025-08-08 12:18,1
 2,Miles,Indianapolis Colts @ Jacksonville Jaguars,2.0,Jacksonville Jaguars,2025-08-08 12:19,1
 2,Jack,Indianapolis Colts @ Jacksonville Jaguars,2.0,Indianapolis Colts,2025-08-08 12:20,0
-2,Louis,Kansas City Chiefs @ Las Vegas Raiders,-4.0,Kansas City Chiefs,2025-08-08 12:21,1
-2,Miles,Kansas City Chiefs @ Las Vegas Raiders,-4.0,Las Vegas Raiders,2025-08-08 12:22,0
-2,Jack,Kansas City Chiefs @ Las Vegas Raiders,-4.0,Kansas City Chiefs,2025-08-08 12:23,1
+2,Louis,Kansas City Chiefs @ Las Vegas Raiders,4.0,Kansas City Chiefs,2025-08-08 12:21,1
+2,Miles,Kansas City Chiefs @ Las Vegas Raiders,4.0,Las Vegas Raiders,2025-08-08 12:22,0
+2,Jack,Kansas City Chiefs @ Las Vegas Raiders,4.0,Kansas City Chiefs,2025-08-08 12:23,1
 2,Louis,Los Angeles Chargers @ Los Angeles Rams,1.5,Los Angeles Rams,2025-08-08 12:24,1
 2,Miles,Los Angeles Chargers @ Los Angeles Rams,1.5,Los Angeles Rams,2025-08-08 12:25,1
 2,Jack,Los Angeles Chargers @ Los Angeles Rams,1.5,Los Angeles Chargers,2025-08-08 12:26,0
@@ -89,58 +89,58 @@ week,user,game,spread,pick,timestamp,correct
 2,Louis,San Francisco 49ers @ Seattle Seahawks,-2.5,San Francisco 49ers,2025-08-08 12:39,1
 2,Miles,San Francisco 49ers @ Seattle Seahawks,-2.5,San Francisco 49ers,2025-08-08 12:40,1
 2,Jack,San Francisco 49ers @ Seattle Seahawks,-2.5,Seattle Seahawks,2025-08-08 12:41,0
-2,Louis,Tampa Bay Buccaneers @ Tennessee Titans,1.5,Tampa Bay Buccaneers,2025-08-08 12:42,1
-2,Miles,Tampa Bay Buccaneers @ Tennessee Titans,1.5,Tennessee Titans,2025-08-08 12:43,0
-2,Jack,Tampa Bay Buccaneers @ Tennessee Titans,1.5,Tampa Bay Buccaneers,2025-08-08 12:44,1
-2,Louis,Washington Commanders @ Arizona Cardinals,-1.0,Washington Commanders,2025-08-08 12:45,1
-2,Miles,Washington Commanders @ Arizona Cardinals,-1.0,Arizona Cardinals,2025-08-08 12:46,0
-2,Jack,Washington Commanders @ Arizona Cardinals,-1.0,Washington Commanders,2025-08-08 12:47,1
-3,Louis,Arizona Cardinals @ Buffalo Bills,3.0,Arizona Cardinals,2025-08-15 12:00,1
-3,Miles,Arizona Cardinals @ Buffalo Bills,3.0,Arizona Cardinals,2025-08-15 12:01,0
-3,Jack,Arizona Cardinals @ Buffalo Bills,3.0,Buffalo Bills,2025-08-15 12:02,1
-3,Louis,Atlanta Falcons @ Carolina Panthers,-2.0,Atlanta Falcons,2025-08-15 12:03,1
-3,Miles,Atlanta Falcons @ Carolina Panthers,-2.0,Carolina Panthers,2025-08-15 12:04,0
-3,Jack,Atlanta Falcons @ Carolina Panthers,-2.0,Atlanta Falcons,2025-08-15 12:05,1
-3,Louis,Baltimore Ravens @ Chicago Bears,1.5,Baltimore Ravens,2025-08-15 12:06,1
-3,Miles,Baltimore Ravens @ Chicago Bears,1.5,Chicago Bears,2025-08-15 12:07,0
-3,Jack,Baltimore Ravens @ Chicago Bears,1.5,Baltimore Ravens,2025-08-15 12:08,1
-3,Louis,Cincinnati Bengals @ Cleveland Browns,-3.0,Cleveland Browns,2025-08-15 12:09,1
-3,Miles,Cincinnati Bengals @ Cleveland Browns,-3.0,Cincinnati Bengals,2025-08-15 12:10,0
-3,Jack,Cincinnati Bengals @ Cleveland Browns,-3.0,Cleveland Browns,2025-08-15 12:11,1
-3,Louis,Dallas Cowboys @ Detroit Lions,2.5,Dallas Cowboys,2025-08-15 12:12,1
-3,Miles,Dallas Cowboys @ Detroit Lions,2.5,Detroit Lions,2025-08-15 12:13,0
-3,Jack,Dallas Cowboys @ Detroit Lions,2.5,Dallas Cowboys,2025-08-15 12:14,1
+2,Louis,Tampa Bay Buccaneers @ Tennessee Titans,5.5,Tampa Bay Buccaneers,2025-08-08 12:42,1
+2,Miles,Tampa Bay Buccaneers @ Tennessee Titans,5.5,Tennessee Titans,2025-08-08 12:43,0
+2,Jack,Tampa Bay Buccaneers @ Tennessee Titans,5.5,Tampa Bay Buccaneers,2025-08-08 12:44,1
+2,Louis,Washington Commanders @ Arizona Cardinals,5.0,Washington Commanders,2025-08-08 12:45,1
+2,Miles,Washington Commanders @ Arizona Cardinals,5.0,Arizona Cardinals,2025-08-08 12:46,0
+2,Jack,Washington Commanders @ Arizona Cardinals,5.0,Washington Commanders,2025-08-08 12:47,1
+3,Louis,Arizona Cardinals @ Buffalo Bills,-3.0,Arizona Cardinals,2025-08-15 12:00,1
+3,Miles,Arizona Cardinals @ Buffalo Bills,-3.0,Arizona Cardinals,2025-08-15 12:01,0
+3,Jack,Arizona Cardinals @ Buffalo Bills,-3.0,Buffalo Bills,2025-08-15 12:02,1
+3,Louis,Atlanta Falcons @ Carolina Panthers,2.0,Atlanta Falcons,2025-08-15 12:03,1
+3,Miles,Atlanta Falcons @ Carolina Panthers,2.0,Carolina Panthers,2025-08-15 12:04,0
+3,Jack,Atlanta Falcons @ Carolina Panthers,2.0,Atlanta Falcons,2025-08-15 12:05,1
+3,Louis,Baltimore Ravens @ Chicago Bears,5.5,Baltimore Ravens,2025-08-15 12:06,1
+3,Miles,Baltimore Ravens @ Chicago Bears,5.5,Chicago Bears,2025-08-15 12:07,0
+3,Jack,Baltimore Ravens @ Chicago Bears,5.5,Baltimore Ravens,2025-08-15 12:08,1
+3,Louis,Cincinnati Bengals @ Cleveland Browns,3.0,Cleveland Browns,2025-08-15 12:09,1
+3,Miles,Cincinnati Bengals @ Cleveland Browns,3.0,Cincinnati Bengals,2025-08-15 12:10,0
+3,Jack,Cincinnati Bengals @ Cleveland Browns,3.0,Cleveland Browns,2025-08-15 12:11,1
+3,Louis,Dallas Cowboys @ Detroit Lions,-2.5,Dallas Cowboys,2025-08-15 12:12,1
+3,Miles,Dallas Cowboys @ Detroit Lions,-2.5,Detroit Lions,2025-08-15 12:13,0
+3,Jack,Dallas Cowboys @ Detroit Lions,-2.5,Dallas Cowboys,2025-08-15 12:14,1
 3,Louis,Denver Broncos @ Green Bay Packers,-1.5,Denver Broncos,2025-08-15 12:15,1
 3,Miles,Denver Broncos @ Green Bay Packers,-1.5,Denver Broncos,2025-08-15 12:16,0
 3,Jack,Denver Broncos @ Green Bay Packers,-1.5,Green Bay Packers,2025-08-15 12:17,1
 3,Louis,Houston Texans @ Indianapolis Colts,2.0,Indianapolis Colts,2025-08-15 12:18,1
 3,Miles,Houston Texans @ Indianapolis Colts,2.0,Indianapolis Colts,2025-08-15 12:19,1
 3,Jack,Houston Texans @ Indianapolis Colts,2.0,Houston Texans,2025-08-15 12:20,0
-3,Louis,Jacksonville Jaguars @ Kansas City Chiefs,-2.5,Kansas City Chiefs,2025-08-15 12:21,1
-3,Miles,Jacksonville Jaguars @ Kansas City Chiefs,-2.5,Kansas City Chiefs,2025-08-15 12:22,1
-3,Jack,Jacksonville Jaguars @ Kansas City Chiefs,-2.5,Jacksonville Jaguars,2025-08-15 12:23,0
-3,Louis,Las Vegas Raiders @ Los Angeles Rams,3.5,Los Angeles Rams,2025-08-15 12:24,1
-3,Miles,Las Vegas Raiders @ Los Angeles Rams,3.5,Los Angeles Rams,2025-08-15 12:25,1
-3,Jack,Las Vegas Raiders @ Los Angeles Rams,3.5,Las Vegas Raiders,2025-08-15 12:26,0
+3,Louis,Jacksonville Jaguars @ Kansas City Chiefs,-6.5,Kansas City Chiefs,2025-08-15 12:21,1
+3,Miles,Jacksonville Jaguars @ Kansas City Chiefs,-6.5,Kansas City Chiefs,2025-08-15 12:22,1
+3,Jack,Jacksonville Jaguars @ Kansas City Chiefs,-6.5,Jacksonville Jaguars,2025-08-15 12:23,0
+3,Louis,Las Vegas Raiders @ Los Angeles Rams,-3.5,Los Angeles Rams,2025-08-15 12:24,1
+3,Miles,Las Vegas Raiders @ Los Angeles Rams,-3.5,Los Angeles Rams,2025-08-15 12:25,1
+3,Jack,Las Vegas Raiders @ Los Angeles Rams,-3.5,Las Vegas Raiders,2025-08-15 12:26,0
 3,Louis,Los Angeles Chargers @ Miami Dolphins,-1.0,Miami Dolphins,2025-08-15 12:27,1
 3,Miles,Los Angeles Chargers @ Miami Dolphins,-1.0,Miami Dolphins,2025-08-15 12:28,0
 3,Jack,Los Angeles Chargers @ Miami Dolphins,-1.0,Los Angeles Chargers,2025-08-15 12:29,1
-3,Louis,Minnesota Vikings @ New England Patriots,2.5,New England Patriots,2025-08-15 12:30,1
-3,Miles,Minnesota Vikings @ New England Patriots,2.5,New England Patriots,2025-08-15 12:31,0
-3,Jack,Minnesota Vikings @ New England Patriots,2.5,Minnesota Vikings,2025-08-15 12:32,1
+3,Louis,Minnesota Vikings @ New England Patriots,3.5,New England Patriots,2025-08-15 12:30,1
+3,Miles,Minnesota Vikings @ New England Patriots,3.5,New England Patriots,2025-08-15 12:31,0
+3,Jack,Minnesota Vikings @ New England Patriots,3.5,Minnesota Vikings,2025-08-15 12:32,1
 3,Louis,New Orleans Saints @ New York Giants,-2.0,New Orleans Saints,2025-08-15 12:33,1
 3,Miles,New Orleans Saints @ New York Giants,-2.0,New Orleans Saints,2025-08-15 12:34,0
 3,Jack,New Orleans Saints @ New York Giants,-2.0,New York Giants,2025-08-15 12:35,1
-3,Louis,New York Jets @ Philadelphia Eagles,1.5,New York Jets,2025-08-15 12:36,1
-3,Miles,New York Jets @ Philadelphia Eagles,1.5,Philadelphia Eagles,2025-08-15 12:37,0
-3,Jack,New York Jets @ Philadelphia Eagles,1.5,New York Jets,2025-08-15 12:38,1
+3,Louis,New York Jets @ Philadelphia Eagles,-7.5,New York Jets,2025-08-15 12:36,1
+3,Miles,New York Jets @ Philadelphia Eagles,-7.5,Philadelphia Eagles,2025-08-15 12:37,0
+3,Jack,New York Jets @ Philadelphia Eagles,-7.5,New York Jets,2025-08-15 12:38,1
 3,Louis,Pittsburgh Steelers @ San Francisco 49ers,-3.0,Pittsburgh Steelers,2025-08-15 12:39,1
 3,Miles,Pittsburgh Steelers @ San Francisco 49ers,-3.0,San Francisco 49ers,2025-08-15 12:40,1
 3,Jack,Pittsburgh Steelers @ San Francisco 49ers,-3.0,Pittsburgh Steelers,2025-08-15 12:41,0
-3,Louis,Seattle Seahawks @ Tampa Bay Buccaneers,2.5,Seattle Seahawks,2025-08-15 12:42,1
-3,Miles,Seattle Seahawks @ Tampa Bay Buccaneers,2.5,Tampa Bay Buccaneers,2025-08-15 12:43,1
-3,Jack,Seattle Seahawks @ Tampa Bay Buccaneers,2.5,Seattle Seahawks,2025-08-15 12:44,0
-3,Louis,Tennessee Titans @ Washington Commanders,-1.0,Washington Commanders,2025-08-15 12:45,1
-3,Miles,Tennessee Titans @ Washington Commanders,-1.0,Washington Commanders,2025-08-15 12:46,1
-3,Jack,Tennessee Titans @ Washington Commanders,-1.0,Tennessee Titans,2025-08-15 12:47,0
+3,Louis,Seattle Seahawks @ Tampa Bay Buccaneers,-2.5,Seattle Seahawks,2025-08-15 12:42,1
+3,Miles,Seattle Seahawks @ Tampa Bay Buccaneers,-2.5,Tampa Bay Buccaneers,2025-08-15 12:43,1
+3,Jack,Seattle Seahawks @ Tampa Bay Buccaneers,-2.5,Seattle Seahawks,2025-08-15 12:44,0
+3,Louis,Tennessee Titans @ Washington Commanders,-8.0,Washington Commanders,2025-08-15 12:45,1
+3,Miles,Tennessee Titans @ Washington Commanders,-8.0,Washington Commanders,2025-08-15 12:46,1
+3,Jack,Tennessee Titans @ Washington Commanders,-8.0,Tennessee Titans,2025-08-15 12:47,0
 

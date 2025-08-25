@@ -830,11 +830,11 @@ def render_demo_mode():
 
         # Show a success message if picks were "submitted"
         if st.session_state.get("demo_picks_submitted", False):
-            st.success("✅ Demo picks submitted! (Not actually saved)")
+            st.success("✅ Demo picks submitted!")
 
         # Build pick form (always visible)
         demo_picks = []
-        st.caption("Select your pick for each game below. This is just an example and will not be saved.")
+        #st.caption("Select your pick for each game below. This is just an example and will not be saved.")
         for i, row in demo_make_picks_df.iterrows():
             formatted_game = format_game_with_spread(row["game"], row["spread"])
             if "@" in row["game"]:
@@ -873,7 +873,7 @@ def render_demo_mode():
             if st.button("Submit Picks"):
                 st.session_state.demo_picks_this_week = demo_picks
                 st.session_state.demo_picks_submitted = True
-                st.success("✅ Demo picks submitted! (Not actually saved)")
+                st.success("✅ Demo picks submitted!")
                 st.rerun()
         with col2:
             if st.button("Reset Picks"):
@@ -932,12 +932,14 @@ def render_demo_mode():
             display_df["Result"] = display_df.apply(
                 lambda row: result_to_emoji("correct" if row["pick"] == row["covered"] else "incorrect"), axis=1
             )
-            st.table(
+            st.dataframe(
                 display_df[["formatted_game", "pick", "Result"]].rename(columns={
                     "formatted_game": "Game",
                     "pick": "Pick",
                     "Result": "Result"
-                })
+                }),
+                use_container_width=True,
+                hide_index=True
             )
         else:
             st.write(f"No picks found for {selected_user} in Week {selected_week}.")
@@ -1007,7 +1009,7 @@ def render_demo_mode():
             })
             summary = summary.sort_values("User")
             summary["Correct Pick %"] = summary["Correct Pick %"].apply(lambda x: f"{x:.1f}%")
-            st.subheader("Summary Table (Concluded Games Only)")
+            st.subheader("Group Scoreboard")
             st.dataframe(
                 summary[["User", "Correct Picks", "Total Picks", "Correct Pick %"]],
                 use_container_width=True,
@@ -1060,7 +1062,7 @@ def render_demo_mode():
         st.dataframe(metrics_df, use_container_width=True, hide_index=True)
 
         # Most Picked Teams graph
-        st.subheader("📈 Most Picked Teams (Completed Games)")
+        st.subheader("📈 Most Picked Teams")
         team_picks = demo_merged.groupby("pick").size().reset_index(name="count")
         top_teams = team_picks.nlargest(5, "count")
         display_names = []
@@ -1092,7 +1094,7 @@ def render_demo_mode():
         st.plotly_chart(fig, use_container_width=True, key="demo_most_picked")
 
         # Least Picked Teams graph
-        st.subheader("📉 Least Picked Teams (Completed Games)")
+        st.subheader("📉 Least Picked Teams")
         bottom_teams = team_picks.nsmallest(5, "count")
         display_names = []
         colors = []
@@ -1261,6 +1263,18 @@ def render_demo_mode():
             use_container_width=True,
             hide_index=True
         )
+
+    st.markdown(
+    """
+    <hr style="margin-top:2em;margin-bottom:1em;">
+    <div style="text-align:center; font-size: 1.1em;">
+        🔗 Questions or feedback? Connect with me:<br>
+        <a href="https://github.com/jackewings" target="_blank">GitHub</a> |
+        <a href="https://www.linkedin.com/in/jack-ewings-profile/" target="_blank">LinkedIn</a>
+    </div>
+    """,
+    unsafe_allow_html=True
+    )
 
 if __name__ == "__main__":
     main()
