@@ -39,7 +39,6 @@ class TestNFLPickemApp(unittest.TestCase):
             home_team, away_team = [t.strip() for t in game.split("vs.")]
             display_format = "{} ({}) vs. {}"
         
-        # Get display names
         away_display = TEAM_DISPLAY_NAMES.get(away_team, away_team)
         home_display = TEAM_DISPLAY_NAMES.get(home_team, home_team)
         
@@ -71,7 +70,7 @@ class TestNFLPickemApp(unittest.TestCase):
         """Test game_has_started with invalid time formats"""
         self.assertFalse(game_has_started("invalid_time"))
         self.assertFalse(game_has_started(""))
-        self.assertFalse(game_has_started("2023-13-45T25:99:99Z"))  # Invalid date
+        self.assertFalse(game_has_started("2023-13-45T25:99:99Z")) 
 
     def test_get_team_display_and_color(self):
         """Test team display name and color retrieval"""
@@ -105,46 +104,6 @@ class TestNFLPickemApp(unittest.TestCase):
         """Test ranking with multiple sorting columns"""
         ranked_df = add_rank(self.ranking_data, ['correct', 'correct_pct'])
         self.assertEqual(ranked_df['Rank'].tolist(), [1, 3, 1, 3])
-
-    '''def test_load_picks_empty_file(self):
-        """Test loading picks from empty or non-existent file"""
-        # Ensure test runs with no existing file
-        if PICKS_FILE.exists():
-            PICKS_FILE.unlink()
-            
-        empty_df = load_picks()
-        expected_columns = ["week", "user", "game", "spread", "pick", "timestamp"]
-        
-        self.assertTrue(all(col in empty_df.columns for col in expected_columns))
-        self.assertTrue(empty_df.empty)'''
-
-    '''def test_load_picks_with_data(self):
-        """Test loading picks with existing data"""
-        # Create test data
-        test_picks = pd.DataFrame({
-            "week": [1, 1],
-            "user": ["TestUser", "TestUser"],
-            "game": ["Team A @ Team B", "Team C @ Team D"],
-            "spread": [-3.0, 2.5],
-            "pick": ["Team A", "Team D"],
-            "timestamp": [datetime.now(), datetime.now()]
-        })
-        
-        # Save test data
-        test_picks.to_csv(PICKS_FILE, index=False)
-        
-        # Load and verify
-        loaded_picks = load_picks()
-        self.assertEqual(len(loaded_picks), 2)
-        self.assertEqual(loaded_picks["user"].iloc[0], "TestUser")
-        
-        # Clean up
-        PICKS_FILE.unlink()'''
-
-    '''def tearDown(self):
-        """Clean up after each test"""
-        if PICKS_FILE.exists():
-            PICKS_FILE.unlink()'''
 
 if __name__ == '__main__':
     unittest.main()

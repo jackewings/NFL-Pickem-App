@@ -261,5 +261,5 @@ class NFLData:
         except Exception as e:
             logger.error(f"Error getting game results: {str(e)}")
             return []
-# Create singleton instance
+
 nfl_data = NFLData()

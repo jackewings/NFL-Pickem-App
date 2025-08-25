@@ -382,7 +382,6 @@ def render_group_picks_tab(picks_df):
             game_started = game_has_started(commence_time_str) if commence_time_str else False
 
             if game_started:
-                # Show game as "Vikings @ Bears" (no spread)
                 if "@" in g["game"]:
                     away_team, home_team = g["game"].split(" @ ")
                 else:
@@ -588,7 +587,6 @@ def render_group_data_tab(picks_df):
             )
             st.plotly_chart(fig, use_container_width=True, key="least_picked")
 
-            # ATS Records (remains unchanged, as this is based on actual results)
             ats_records = pd.DataFrame()
             for team in NFL_TEAM_COLORS.keys():
                 games_covered = len(results_df[results_df['covered'] == team])
@@ -764,7 +762,6 @@ def render_live_mode():
     if "user_authenticated" not in st.session_state:
         st.session_state.user_authenticated = False
 
-    # Direct password entry without user selection first
     if not st.session_state.user_authenticated:
         pw = st.text_input("Enter your user password:", type="password")
         if st.button("Login"):
@@ -814,7 +811,7 @@ def render_demo_mode():
     # For demo, set CURRENT_WEEK to max week in picks
     demo_current_week = demo_picks_df["week"].max()
 
-    # Make Picks Tab (read-only)
+    # Make Picks Tab 
     with demo_tabs[0]:
         st.header("Make Picks (Demo)")
         st.warning("This is a demo. Picks are not saved and do not affect any leaderboard.")
@@ -834,7 +831,6 @@ def render_demo_mode():
 
         # Build pick form (always visible)
         demo_picks = []
-        #st.caption("Select your pick for each game below. This is just an example and will not be saved.")
         for i, row in demo_make_picks_df.iterrows():
             formatted_game = format_game_with_spread(row["game"], row["spread"])
             if "@" in row["game"]:
@@ -939,7 +935,8 @@ def render_demo_mode():
                     "Result": "Result"
                 }),
                 use_container_width=True,
-                hide_index=True
+                hide_index=True,
+                height=598
             )
         else:
             st.write(f"No picks found for {selected_user} in Week {selected_week}.")
@@ -1187,7 +1184,7 @@ def render_demo_mode():
         fig.update_layout(
             yaxis=dict(
                 tickformat=".0f",
-                range=[0, 100],  # <-- Ensure y-axis is 0-100%
+                range=[0, 100],  
                 title="Cover %"
             ),
             dragmode=False,

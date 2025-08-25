@@ -5,7 +5,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Constants
 CENTRAL_TZ = pytz.timezone('America/Chicago')
 UTC_TZ = pytz.UTC
 
@@ -27,11 +26,9 @@ def parse_utc_timestamp(timestamp_str: str) -> Optional[datetime]:
     Handles API's 'Z' format and ISO format strings.
     """
     try:
-        # Remove 'Z' and add UTC timezone designation
         clean_ts = timestamp_str.replace('Z', '+00:00')
         dt = datetime.fromisoformat(clean_ts)
         
-        # Ensure timezone is set
         if dt.tzinfo is None:
             dt = UTC_TZ.localize(dt)
             

@@ -202,7 +202,7 @@ LOGGING_CONFIG: Dict[str, Any] = {
         }
     },
     "loggers": {
-        "": {  # Root logger
+        "": {  
             "handlers": ["console", "file"],
             "level": "INFO",
         }
