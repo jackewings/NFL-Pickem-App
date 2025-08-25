@@ -1,7 +1,49 @@
 week,game,covered
-1,Minnesota Vikings @ Chicago Bears,Minnesota Vikings
-1,New England Patriots @ New York Jets,New York Jets
-2,New York Giants @ Dallas Cowboys,Dallas Cowboys
-2,Philadelphia Eagles @ Washington Commanders,Philadelphia Eagles
-3,Los Angeles Rams @ Minnesota Vikings,Minnesota Vikings
-3,Seattle Seahawks @ Arizona Cardinals,Seattle Seahawks
+1,Arizona Cardinals @ Atlanta Falcons,Atlanta Falcons
+1,Baltimore Ravens @ Buffalo Bills,Baltimore Ravens
+1,Carolina Panthers @ Chicago Bears,Chicago Bears
+1,Cincinnati Bengals @ Cleveland Browns,Cleveland Browns
+1,Dallas Cowboys @ Denver Broncos,Dallas Cowboys
+1,Detroit Lions @ Green Bay Packers,Green Bay Packers
+1,Houston Texans @ Indianapolis Colts,Houston Texans
+1,Jacksonville Jaguars @ Kansas City Chiefs,Kansas City Chiefs
+1,Las Vegas Raiders @ Los Angeles Chargers,Las Vegas Raiders
+1,Los Angeles Rams @ Miami Dolphins,Miami Dolphins
+1,Minnesota Vikings @ New England Patriots,Minnesota Vikings
+1,New Orleans Saints @ New York Giants,New Orleans Saints
+1,New York Jets @ Philadelphia Eagles,Philadelphia Eagles
+1,Pittsburgh Steelers @ San Francisco 49ers,Pittsburgh Steelers
+1,Seattle Seahawks @ Tampa Bay Buccaneers,Seattle Seahawks
+1,Tennessee Titans @ Washington Commanders,Tennessee Titans
+2,Atlanta Falcons @ Baltimore Ravens,Atlanta Falcons
+2,Buffalo Bills @ Carolina Panthers,Buffalo Bills
+2,Chicago Bears @ Cincinnati Bengals,Cincinnati Bengals
+2,Cleveland Browns @ Dallas Cowboys,Dallas Cowboys
+2,Denver Broncos @ Detroit Lions,Detroit Lions
+2,Green Bay Packers @ Houston Texans,Houston Texans
+2,Indianapolis Colts @ Jacksonville Jaguars,Jacksonville Jaguars
+2,Kansas City Chiefs @ Las Vegas Raiders,Kansas City Chiefs
+2,Los Angeles Chargers @ Los Angeles Rams,Los Angeles Rams
+2,Miami Dolphins @ Minnesota Vikings,Minnesota Vikings
+2,New England Patriots @ New Orleans Saints,New England Patriots
+2,New York Giants @ New York Jets,New York Giants
+2,Philadelphia Eagles @ Pittsburgh Steelers,Philadelphia Eagles
+2,San Francisco 49ers @ Seattle Seahawks,Seattle Seahawks
+2,Tampa Bay Buccaneers @ Tennessee Titans,Tampa Bay Buccaneers
+2,Washington Commanders @ Arizona Cardinals,Washington Commanders
+3,Arizona Cardinals @ Buffalo Bills,Arizona Cardinals
+3,Atlanta Falcons @ Carolina Panthers,Atlanta Falcons
+3,Baltimore Ravens @ Chicago Bears,Baltimore Ravens
+3,Cincinnati Bengals @ Cleveland Browns,Cincinnati Bengals
+3,Dallas Cowboys @ Detroit Lions,Dallas Cowboys
+3,Denver Broncos @ Green Bay Packers,Denver Broncos
+3,Houston Texans @ Indianapolis Colts,Indianapolis Colts
+3,Jacksonville Jaguars @ Kansas City Chiefs,Jacksonville Jaguars
+3,Las Vegas Raiders @ Los Angeles Rams,Los Angeles Rams
+3,Los Angeles Chargers @ Miami Dolphins,Los Angeles Chargers
+3,Minnesota Vikings @ New England Patriots,Minnesota Vikings
+3,New Orleans Saints @ New York Giants,New Orleans Saints
+3,New York Jets @ Philadelphia Eagles,New York Jets
+3,Pittsburgh Steelers @ San Francisco 49ers,San Francisco 49ers
+3,Seattle Seahawks @ Tampa Bay Buccaneers,Tampa Bay Buccaneers
+3,Tennessee Titans @ Washington Commanders,Washington Commanders

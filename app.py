@@ -626,7 +626,7 @@ def render_group_data_tab(picks_df):
             ])
             fig.update_layout(
                 yaxis=dict(
-                    tickformat=".0%",
+                    tickformat=".0f",
                     range=[0, 100],
                     title="Cover %"
                 ),
@@ -658,7 +658,7 @@ def render_group_data_tab(picks_df):
             ])
             fig.update_layout(
                 yaxis=dict(
-                    tickformat=".0%",
+                    tickformat=".0f",
                     range=[0, 100],
                     title="Cover %"
                 ),
@@ -1067,8 +1067,8 @@ def render_demo_mode():
         ])
         fig.update_layout(
             yaxis=dict(
-                tickformat=".0%",
-                range=[0, 100],
+                tickformat=".0f",
+                range=[0, 100], 
                 title="Cover %"
             ),
             dragmode=False,
@@ -1096,8 +1096,8 @@ def render_demo_mode():
         ])
         fig.update_layout(
             yaxis=dict(
-                tickformat=".0%",
-                range=[0, 100],
+                tickformat=".0f",
+                range=[0, 100],  # <-- Ensure y-axis is 0-100%
                 title="Cover %"
             ),
             dragmode=False,
