@@ -58,5 +58,6 @@ data/*
 !data/results.csv
 !data/demo_picks.csv
 !data/demo_results.csv
+!data/demo_make_picks.csv
 
 gcp_service_account.json
