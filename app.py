@@ -692,21 +692,45 @@ def render_leaderboards_tab(picks_df):
         })[["Rank", "User", "Week", "Correct Picks", "Correct Pick %"]])
 
         # Season leaderboard
-        st.subheader("🏆 Season Total Leaderboard")
-        total = (
-            scored_picks.groupby("user")["result"]
-            .apply(lambda x: (x == "correct").sum())
-            .reset_index(name="correct")
+    st.subheader("🏆 Season Total Leaderboard")
+    if results_available:
+        results_df = pd.read_csv(RESULTS_FILE)
+        scored_picks = score_all_picks(picks_df, results_df)
+        # Add a column for correct picks
+        scored_picks["is_correct"] = scored_picks["pick"] == scored_picks["covered"]
+
+        # Find best team for each user
+        best_team = (
+            scored_picks[scored_picks["is_correct"]]
+            .groupby(["user", "pick"])
+            .size()
+            .reset_index(name="correct_count")
+            .sort_values(["user", "correct_count"], ascending=[True, False])
+            .drop_duplicates("user")
+            .set_index("user")["pick"]
+            .to_dict()
         )
-        total["total"] = scored_picks.groupby("user")["result"].count().values
+
+        total = (
+            scored_picks.groupby("user")["is_correct"]
+            .agg(correct="sum", total="count")
+            .reset_index()
+        )
         total["correct_pct"] = total["correct"] / total["total"] * 100
         total = add_rank(total, ["correct", "correct_pct"])
-        st.table(total.rename(columns={
-            "user": "User",
-            "correct": "Correct Picks",
-            "correct_pct": "Correct Pick %",
-            "Rank": "Rank"
-        })[["Rank", "User", "Correct Picks", "Correct Pick %"]])
+        total["correct_pct"] = total["correct_pct"].apply(lambda x: f"{x:.1f}%")
+        total["Best Team"] = total["user"].map(lambda u: TEAM_DISPLAY_NAMES.get(best_team.get(u, ""), best_team.get(u, "")))
+        st.dataframe(
+            total.rename(columns={
+                "user": "User",
+                "correct": "Correct Picks",
+                "correct_pct": "Correct Pick %",
+                "Rank": "Rank",
+                "Best Team": "Best Team"
+            })[["Rank", "User", "Correct Picks", "Correct Pick %", "Best Team"]],
+            use_container_width=True,
+            hide_index=True
+        )
     else:
         st.info("No results available yet.")
 
@@ -793,7 +817,7 @@ def render_demo_mode():
     # Make Picks Tab (read-only)
     with demo_tabs[0]:
         st.header("Make Picks (Demo)")
-        st.info("This is a demo. Picks are not saved and do not affect any leaderboard.")
+        st.warning("This is a demo. Picks are not saved and do not affect any leaderboard.")
 
         # Load mock Week 4 schedule
         demo_make_picks_df = pd.read_csv(Path(DATA_DIR) / "demo_make_picks.csv")
@@ -1192,36 +1216,48 @@ def render_demo_mode():
         st.dataframe(
             weekly.rename(columns={
                 "user": "User",
-                "week": "Week",
                 "correct": "Correct Picks",
                 "correct_pct": "Correct Pick %",
-                "total": "Total Picks",
                 "Rank": "Rank"
-            })[["Rank", "User", "Week", "Correct Picks", "Total Picks", "Correct Pick %"]],
+            })[["Rank", "User", "Correct Picks", "Correct Pick %"]],
             use_container_width=True,
             hide_index=True
         )
 
         # Season leaderboard
         st.subheader("🏆 Season Total Leaderboard")
+        merged = demo_picks_df.merge(demo_results_df, on=["week", "game"])
+        merged["is_correct"] = merged["pick"] == merged["covered"]
+
+        # Find best team for each user
+        best_team = (
+            merged[merged["is_correct"]]
+            .groupby(["user", "pick"])
+            .size()
+            .reset_index(name="correct_count")
+            .sort_values(["user", "correct_count"], ascending=[True, False])
+            .drop_duplicates("user")
+            .set_index("user")["pick"]
+            .to_dict()
+        )
+
         total = (
-            demo_picks_df.merge(demo_results_df, on=["week", "game"])
-            .assign(correct=lambda df: df["pick"] == df["covered"])
-            .groupby("user")
-            .agg(correct=("correct", "sum"), total=("pick", "count"))
+            merged.groupby("user")["is_correct"]
+            .agg(correct="sum", total="count")
             .reset_index()
         )
         total["correct_pct"] = total["correct"] / total["total"] * 100
         total = add_rank(total, ["correct", "correct_pct"])
         total["correct_pct"] = total["correct_pct"].apply(lambda x: f"{x:.1f}%")
+        total["Best Team"] = total["user"].map(lambda u: TEAM_DISPLAY_NAMES.get(best_team.get(u, ""), best_team.get(u, "")))
         st.dataframe(
             total.rename(columns={
                 "user": "User",
                 "correct": "Correct Picks",
                 "correct_pct": "Correct Pick %",
-                "total": "Total Picks",
-                "Rank": "Rank"
-            })[["Rank", "User", "Correct Picks", "Total Picks", "Correct Pick %"]],
+                "Rank": "Rank",
+                "Best Team": "Best Team"
+            })[["Rank", "User", "Correct Picks", "Correct Pick %", "Best Team"]],
             use_container_width=True,
             hide_index=True
         )
