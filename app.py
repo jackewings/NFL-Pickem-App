@@ -356,14 +356,12 @@ def render_past_picks_tab(picks_df):
                 lambda x: TEAM_DISPLAY_NAMES.get(x, x)
             )
             scored_picks["Result"] = scored_picks["result"].apply(result_to_emoji)
-            st.dataframe(
+            st.table(
                 scored_picks[["formatted_game", "pick", "Result"]].rename(columns={
                     "formatted_game": "Game",
                     "pick": "Pick",
                     "Result": "Result"
-                }),
-                use_container_width=True,
-                hide_index=True
+                })
             )
         else:
             st.write(f"No picks found for {selected_user} in Week {selected_week}.")
@@ -794,20 +792,88 @@ def render_demo_mode():
 
     # Make Picks Tab (read-only)
     with demo_tabs[0]:
-        st.header("Make Picks")
-        st.warning("⚠️ Picks cannot be made in demo mode.")
-        st.write("Sample picks interface shown below:")
+        st.header("Make Picks (Demo)")
+        st.info("This is a demo. Picks are not saved and do not affect any leaderboard.")
 
-        sample_game = "Carolina Panthers @ New Orleans Saints"
-        sample_spread = 1.5
-        st.markdown(f"""
-        Example Game:
-        {format_game_with_spread(sample_game, sample_spread)} 
-        """)
-        team1, team2 = sample_game.split(" @ ")
-        team1_display = TEAM_DISPLAY_NAMES.get(team1, team1)
-        team2_display = TEAM_DISPLAY_NAMES.get(team2, team2)
-        st.selectbox("Make your pick:", [team1_display, team2_display])
+        # Load mock Week 4 schedule
+        demo_make_picks_df = pd.read_csv(Path(DATA_DIR) / "demo_make_picks.csv")
+        demo_week = 4
+        demo_user = "DemoUser"
+
+        # Use session state to store demo picks
+        if "demo_picks_this_week" not in st.session_state:
+            st.session_state.demo_picks_this_week = []
+
+        # Show a success message if picks were "submitted"
+        if st.session_state.get("demo_picks_submitted", False):
+            st.success("✅ Demo picks submitted! (Not actually saved)")
+
+        # Build pick form (always visible)
+        demo_picks = []
+        st.caption("Select your pick for each game below. This is just an example and will not be saved.")
+        for i, row in demo_make_picks_df.iterrows():
+            formatted_game = format_game_with_spread(row["game"], row["spread"])
+            if "@" in row["game"]:
+                away_team, home_team = row["game"].split(" @ ")
+            else:
+                home_team, away_team = row["game"].split(" vs. ")
+            away_display = TEAM_DISPLAY_NAMES.get(away_team, away_team)
+            home_display = TEAM_DISPLAY_NAMES.get(home_team, home_team)
+            teams_display = [away_display, home_display]
+            # Use previous pick if available, else default to first team
+            prev_pick = None
+            for pick_row in st.session_state.demo_picks_this_week:
+                if pick_row["game"] == row["game"]:
+                    prev_pick = pick_row["pick"]
+                    break
+            default_display = TEAM_DISPLAY_NAMES.get(prev_pick, teams_display[0]) if prev_pick else teams_display[0]
+            pick = st.selectbox(
+                formatted_game,
+                teams_display,
+                key=f"demo_pick_{i}",
+                index=teams_display.index(default_display) if default_display in teams_display else 0
+            )
+            # Store full name for pick
+            pick_full = away_team if pick == away_display else home_team
+            demo_picks.append({
+                "week": demo_week,
+                "user": demo_user,
+                "game": row["game"],
+                "spread": row["spread"],
+                "pick": pick_full,
+                "timestamp": datetime.now().isoformat(timespec="seconds")
+            })
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Submit Picks"):
+                st.session_state.demo_picks_this_week = demo_picks
+                st.session_state.demo_picks_submitted = True
+                st.success("✅ Demo picks submitted! (Not actually saved)")
+                st.rerun()
+        with col2:
+            if st.button("Reset Picks"):
+                st.session_state.demo_picks_this_week = []
+                st.session_state.demo_picks_submitted = False
+                # Also reset all selectboxes
+                for i in range(len(demo_make_picks_df)):
+                    st.session_state.pop(f"demo_pick_{i}", None)
+                st.rerun()
+
+        # Show "Your Picks This Week" table if picks exist
+        if st.session_state.demo_picks_this_week:
+            picks_df = pd.DataFrame(st.session_state.demo_picks_this_week)
+            picks_df["formatted_game"] = picks_df.apply(
+                lambda row: format_game_with_spread(row["game"], row["spread"]), axis=1
+            )
+            picks_df["pick"] = picks_df["pick"].apply(lambda x: TEAM_DISPLAY_NAMES.get(x, x))
+            st.subheader("Your Picks This Week")
+            st.table(
+                picks_df[["formatted_game", "pick"]].rename(columns={
+                    "formatted_game": "Game",
+                    "pick": "Pick"
+                })
+            )
 
     # Past Picks Tab
     with demo_tabs[1]:
@@ -842,14 +908,12 @@ def render_demo_mode():
             display_df["Result"] = display_df.apply(
                 lambda row: result_to_emoji("correct" if row["pick"] == row["covered"] else "incorrect"), axis=1
             )
-            st.dataframe(
+            st.table(
                 display_df[["formatted_game", "pick", "Result"]].rename(columns={
                     "formatted_game": "Game",
                     "pick": "Pick",
                     "Result": "Result"
-                }),
-                use_container_width=True,
-                hide_index=True
+                })
             )
         else:
             st.write(f"No picks found for {selected_user} in Week {selected_week}.")
