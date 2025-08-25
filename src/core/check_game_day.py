@@ -40,13 +40,12 @@ def is_game_day() -> bool:
         )
         
         logger.info(f"Game day check: {'Yes' if has_games else 'No'} games today")
-        # Print 'true' or 'false' for GitHub Actions
         print('true' if has_games else 'false')
         return has_games
         
     except Exception as e:
         logger.error(f"Error checking game day: {str(e)}")
-        print('false')  # Default to false on error
+        print('false')  
         return False
 
 if __name__ == "__main__":

@@ -18,8 +18,7 @@ class TestNFLDataLive(unittest.TestCase):
         """Test real API connection - uses one API request"""
         nfl_data = NFLData()
         spreads = nfl_data.get_weekly_spreads_from_api(save_csv=False)
-        
-        # Verify we got real data back
+
         self.assertTrue(len(spreads) > 0)
         self.assertTrue(all(key in spreads[0] for key in ['home_team', 'away_team', 'spread']))
         print(f"Successfully fetched {len(spreads)} games from the API")
@@ -33,7 +32,6 @@ class TestNFLDataLive(unittest.TestCase):
     def test_live_data(self):
         """Test getting real NFL game data from The Odds API"""
         try:
-            # Check scores endpoint first for yesterday's preseason games
             scores = self.api.get_game_scores()
             print("\nNFL Scores Analysis:")
             print(f"Games found: {len(scores)}")
@@ -53,7 +51,6 @@ class TestNFLDataLive(unittest.TestCase):
                 print("- Preseason games aren't included")
                 print("- Scores aren't available in free tier")
                 
-            # Save response for analysis
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             test_data_dir = Path(project_root) / "test_data"
             test_data_dir.mkdir(exist_ok=True)
@@ -77,7 +74,6 @@ class TestLiveAPI(unittest.TestCase):
         """Test that game scores are properly formatted"""
         scores = self.api.get_game_scores()
         
-        # Save raw response for inspection
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filepath = self.test_data_dir / f"scores_response_{timestamp}.json"
         with open(filepath, "w") as f:
@@ -93,7 +89,6 @@ class TestLiveAPI(unittest.TestCase):
                 print(f"Game Time: {game['commence_time']}")
                 print(f"Last Updated: {game['last_update']}")
                 
-                # Verify required fields
                 self.assertIn('home_team', game)
                 self.assertIn('away_team', game)
                 self.assertIn('scores_home', game)

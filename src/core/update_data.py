@@ -9,7 +9,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.append(str(project_root))
 
-from src.core.data import nfl_data  # Import the singleton instance
+from src.core.data import nfl_data  
 import logging
 
 # Set up logging

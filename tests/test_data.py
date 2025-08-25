@@ -94,7 +94,6 @@ def test_get_weekly_spreads_api_fallback(mock_get_spreads, nfl_data, sample_api_
     """Test API fallback when cache miss"""
     mock_get_spreads.return_value = sample_api_response
     
-    # No cache file exists yet
     result = nfl_data.get_weekly_spreads(week=1)
     
     assert len(result) == 1

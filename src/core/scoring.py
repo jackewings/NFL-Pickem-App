@@ -147,10 +147,8 @@ def score_user_pick(pick_row, results_df):
         (results_df["game"] == pick_row["game"])
     ]
     if result_row.empty:
-        return None  # No result yet
+        return None  
 
-    # You may need to adjust these column names based on your results.csv
-    # Let's assume you have columns: 'home_score', 'away_score', 'game'
     home_team = pick_row["game"].split(" @ ")[1]
     away_team = pick_row["game"].split(" @ ")[0]
     home_score = result_row.iloc[0].get("home_score")
@@ -158,7 +156,6 @@ def score_user_pick(pick_row, results_df):
     spread = float(pick_row["spread"])
     pick = pick_row["pick"]
 
-    # If scores are missing, can't score
     if home_score is None or away_score is None:
         return None
 
@@ -166,12 +163,9 @@ def score_user_pick(pick_row, results_df):
     margin = home_score - away_score
 
     # Determine which team covered the spread
-    # Negative spread: home favorite; Positive: home underdog
     if spread < 0:
-        # Home is favorite, so Chiefs (-2.5) means home_team must win by more than 2.5
         covered = home_team if margin > abs(spread) else away_team
     else:
-        # Home is underdog, so home_team +2.5 means home_team must lose by less than 2.5 or win
         covered = home_team if margin > spread else away_team
 
     # Push logic
