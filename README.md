@@ -30,7 +30,7 @@ A modern, interactive web app for tracking NFL spread picks with friends, featur
 ## Demo
 
 Try the public demo:  
-[https://nfl-pickem.streamlit.app](https://your-app-url.streamlit.app/)
+[NFL Pick'em App](https://nfl-pickem.streamlit.app)
 
 ---
 
