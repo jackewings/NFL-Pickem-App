@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Dict, Any
 import pytz
+from datetime import datetime, timedelta
+
 
 API_ENDPOINTS = {
     "scores": "/sports/americanfootball_nfl/scores"
@@ -147,17 +149,26 @@ TEAM_DISPLAY_NAMES = {
 }
 
 # Current week calculation
-from datetime import datetime
 def get_current_week():
-    """Calculate current NFL week based on date"""
-    today = datetime.now().date()
-    start = datetime.strptime(SEASON_START, "%Y-%m-%d").date()
-    
-    if today < start:
+    """Advance week every Tuesday at noon CT, starting from SEASON_START."""
+    # Set timezone to Central Time
+    central = pytz.timezone("America/Chicago")
+    now = datetime.now(central)
+    # Start at first Tuesday at noon on or after SEASON_START
+    start = datetime.strptime(SEASON_START, "%Y-%m-%d")
+    start = central.localize(start)
+    # Find first Tuesday at noon on or after SEASON_START
+    days_until_tuesday = (1 - start.weekday()) % 7  # 1 = Tuesday
+    first_tuesday = start + timedelta(days=days_until_tuesday)
+    first_tuesday_noon = first_tuesday.replace(hour=12, minute=0, second=0, microsecond=0)
+    if start > first_tuesday_noon:
+        # If SEASON_START is after first Tuesday noon, go to next Tuesday
+        first_tuesday_noon += timedelta(days=7)
+    # Calculate week number
+    if now < first_tuesday_noon:
         return 1
-        
-    week_delta = ((today - start).days // 7) + 1
-    return min(week_delta, 18)  # Cap at week 18
+    week_delta = ((now - first_tuesday_noon).days // 7) + 2  # +2 because week 1 is before first Tuesday
+    return min(week_delta, 18)
 
 CURRENT_WEEK = get_current_week()
 
