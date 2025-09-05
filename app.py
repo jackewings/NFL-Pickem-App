@@ -276,9 +276,16 @@ def render_make_picks_tab(user, picks_df, weekly_games):
         col1, col2 = st.columns(2)
         with col1:
             if st.button("Submit Picks"):
+                # Keep existing picks for games that are locked/concluded (not in weekly_games)
+                locked_games = picks_df[
+                    (picks_df["week"] == CURRENT_WEEK) &
+                    (picks_df["user"] == user) &
+                    (~picks_df["game"].isin([g["game"] for g in weekly_games]))
+                ]
                 new_picks_df = pd.concat([
                     picks_df[~((picks_df["week"] == CURRENT_WEEK) & (picks_df["user"] == user))],
-                    pd.DataFrame(session_picks)
+                    pd.DataFrame(session_picks),
+                    locked_games
                 ], ignore_index=True)
                 save_picks(new_picks_df)
                 st.success("✅ Picks submitted successfully!")
@@ -464,23 +471,26 @@ def render_group_data_tab(picks_df):
         
         results_df = pd.read_csv(RESULTS_FILE)
         scored_picks = score_all_picks(picks_df, results_df)
-        total_picks = scored_picks['result'].isin(['correct', 'incorrect', 'push']).sum()
+        concluded_games = set(results_df["game"])
+        completed_picks = scored_picks[scored_picks["game"].isin(concluded_games)]
+
+        total_picks = completed_picks['result'].isin(['correct', 'incorrect', 'push']).sum()
         
         if total_picks > 0:  # Only show stats if we have concluded games
             # Get spreads for each pick to determine favorite/underdog
-            picks_with_spreads = scored_picks.copy()
+            picks_with_spreads = completed_picks.copy()
             picks_with_spreads['is_favorite'] = picks_with_spreads.apply(
-                lambda row: (row['spread'] < 0 and row['pick'] in row['game'].split(' @ ')[1]) or 
-                            (row['spread'] > 0 and row['pick'] in row['game'].split(' @ ')[0]),
+                lambda row: (float(row['spread']) < 0 and row['pick'] in row['game'].split(' @ ')[1]) or 
+                            (float(row['spread']) > 0 and row['pick'] in row['game'].split(' @ ')[0]),
                 axis=1
             )
-            
+
             favorites_picked = picks_with_spreads['is_favorite'].sum()
             underdogs_picked = total_picks - favorites_picked
-            
-            total_correct = (scored_picks['result'] == 'correct').sum()
-            favorites_correct = ((scored_picks['result'] == 'correct') & picks_with_spreads['is_favorite']).sum()
-            underdogs_correct = ((scored_picks['result'] == 'correct') & ~picks_with_spreads['is_favorite']).sum()
+
+            total_correct = (completed_picks['result'] == 'correct').sum()
+            favorites_correct = ((completed_picks['result'] == 'correct') & picks_with_spreads['is_favorite']).sum()
+            underdogs_correct = ((completed_picks['result'] == 'correct') & ~picks_with_spreads['is_favorite']).sum()
             
             stats_data = {
                 'Metric': [
@@ -587,10 +597,12 @@ def render_group_data_tab(picks_df):
             )
             st.plotly_chart(fig, use_container_width=True, key="least_picked")
 
+            scored_picks = score_all_picks(picks_df, results_df)
             ats_records = pd.DataFrame()
             for team in NFL_TEAM_COLORS.keys():
-                games_covered = len(results_df[results_df['covered'] == team])
-                total_games = len(results_df[results_df['game'].str.contains(team)])
+                # Count how many times this team was the correct pick (covered)
+                games_covered = ((scored_picks['pick'] == team) & (scored_picks['result'] == 'correct')).sum()
+                total_games = (scored_picks['pick'] == team).sum()
                 if total_games > 0:
                     ats_records = pd.concat([ats_records, pd.DataFrame({
                         'team': [team],
@@ -669,37 +681,45 @@ def render_leaderboards_tab(picks_df):
 
     if results_available:
         results_df = pd.read_csv(RESULTS_FILE)
+        concluded_games = set(results_df["game"])
         scored_picks = score_all_picks(picks_df, results_df)
+        completed_picks = scored_picks[scored_picks["game"].isin(concluded_games)]
         
         # Weekly leaderboard
         st.subheader("🏆 Weekly Leaderboard")
         weekly = (
-            scored_picks.groupby(["week", "user"])["result"]
+            completed_picks.groupby(["week", "user"])["result"]
             .apply(lambda x: (x == "correct").sum())
             .reset_index(name="correct")
         )
-        weekly["total"] = scored_picks.groupby(["week", "user"])["result"].count().values
+        weekly["total"] = completed_picks.groupby(["week", "user"])["result"].count().values
         weekly["correct_pct"] = weekly["correct"] / weekly["total"] * 100
         weekly = add_rank(weekly, ["correct", "correct_pct"])
-        st.table(weekly.rename(columns={
-            "user": "User",
-            "week": "Week",
-            "correct": "Correct Picks",
-            "correct_pct": "Correct Pick %",
-            "Rank": "Rank"
-        })[["Rank", "User", "Week", "Correct Picks", "Correct Pick %"]])
+        weekly["correct_pct"] = weekly["correct_pct"].apply(lambda x: f"{x:.1f}%")
+        st.dataframe(
+            weekly.rename(columns={
+                "user": "User",
+                "week": "Week",
+                "correct": "Correct Picks",
+                "correct_pct": "Correct Pick %",
+                "Rank": "Rank"
+            })[["Rank", "User", "Week", "Correct Picks", "Correct Pick %"]],
+            use_container_width=True,
+            hide_index=True
+        )
 
         # Season leaderboard
     st.subheader("🏆 Season Total Leaderboard")
     if results_available:
         results_df = pd.read_csv(RESULTS_FILE)
         scored_picks = score_all_picks(picks_df, results_df)
-        # Add a column for correct picks
-        scored_picks["is_correct"] = scored_picks["pick"] == scored_picks["covered"]
+        concluded_games = set(results_df["game"])
+        completed_picks = scored_picks[scored_picks["game"].isin(concluded_games)].copy()
+        completed_picks["is_correct"] = completed_picks["result"] == "correct"
 
-        # Find best team for each user
+        # Find best team for each user (most correct picks)
         best_team = (
-            scored_picks[scored_picks["is_correct"]]
+            completed_picks[completed_picks["is_correct"]]
             .groupby(["user", "pick"])
             .size()
             .reset_index(name="correct_count")
@@ -710,7 +730,7 @@ def render_leaderboards_tab(picks_df):
         )
 
         total = (
-            scored_picks.groupby("user")["is_correct"]
+            completed_picks.groupby("user")["is_correct"]
             .agg(correct="sum", total="count")
             .reset_index()
         )
