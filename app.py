@@ -375,90 +375,130 @@ def render_past_picks_tab(picks_df):
 
 def render_group_picks_tab(picks_df):
     """Render the Group Picks tab content"""
+
     st.header("Group Picks")
+    st.write("View everyone's picks for games that have already started or concluded.")
 
-    st.write("View everyone's picks for games that have already started.")
-
-    # Get current week games and their start status
+    # Get current week games and picks
     weekly_games = nfl_data.get_weekly_spreads(CURRENT_WEEK)
     current_week_picks = picks_df[picks_df["week"] == CURRENT_WEEK]
+    results_df = pd.read_csv(RESULTS_FILE)
+    concluded_games = set(results_df["game"])
+    scored_picks = score_all_picks(current_week_picks, results_df)
 
+    # 1. Summary Table for Concluded Games
+    week_picks = scored_picks[scored_picks["game"].isin(concluded_games)]
+    if not week_picks.empty:
+        summary = (
+            week_picks.groupby("user")["result"]
+            .apply(lambda x: (x == "correct").sum())
+            .reset_index(name="correct")
+        )
+        summary["total"] = week_picks.groupby("user")["result"].count().values
+        summary["correct_pct"] = summary["correct"] / summary["total"] * 100
+        summary = summary.rename(columns={
+            "user": "User",
+            "correct": "Correct Picks",
+            "correct_pct": "Correct Pick %",
+            "total": "Total Picks"
+        })
+        summary = summary.sort_values("User")
+        summary["Correct Pick %"] = summary["Correct Pick %"].apply(lambda x: f"{x:.1f}%")
+        st.subheader("Summary Table (Concluded Games Only)")
+        st.dataframe(
+            summary[["User", "Correct Picks", "Total Picks", "Correct Pick %"]],
+            use_container_width=True,
+            hide_index=True
+        )
+    else:
+        st.write("No concluded games available for this week.")
+
+    st.markdown("---")
+
+    # 2. Tables for Each Game That Has Started (including in-progress and concluded)
+    # Get all games that have started (not just concluded)
+    started_games = set()
+    # Add all games that have started (from weekly_games)
+    for g in weekly_games:
+        commence_time_str = g.get("commence_time", None)
+        if commence_time_str and game_has_started(commence_time_str):
+            started_games.add(g["game"])
+    # Add all concluded games (from results.csv)
+    started_games.update(concluded_games)
+
+    # Show tables for all started games (including concluded)
+    for game_name in sorted(started_games):
+        # Format as "Chiefs @ Chargers"
+        if "@" in game_name:
+            away_team, home_team = game_name.split(" @ ")
+        else:
+            home_team, away_team = game_name.split(" vs. ")
+        away_display = TEAM_DISPLAY_NAMES.get(away_team, away_team)
+        home_display = TEAM_DISPLAY_NAMES.get(home_team, home_team)
+        display_game = f"{away_display} @ {home_display}"
+
+        st.markdown(f"### {display_game}")
+        # Show all picks for this game
+        game_picks = scored_picks[scored_picks["game"] == game_name]
+        if not game_picks.empty:
+            # Format the Pick column as "Team (+/-spread)"
+            def format_pick(row):
+                pick_team = TEAM_DISPLAY_NAMES.get(row["pick"], row["pick"])
+                spread = float(row["spread"])
+                # Determine if pick is home or away
+                if pick_team == away_display:
+                    pick_spread = -spread
+                elif pick_team == home_display:
+                    pick_spread = spread
+                else:
+                    pick_spread = spread  # fallback
+                sign = "+" if pick_spread > 0 else ""
+                return f"{pick_team} ({sign}{pick_spread:.1f})"
+
+            display_df = game_picks[["user", "pick", "spread", "result"]].copy()
+            display_df["Pick"] = display_df.apply(format_pick, axis=1)
+            display_df = display_df.rename(columns={"user": "User"})
+            display_df = display_df[["User", "Pick", "result"]].sort_values("User").reset_index(drop=True)
+
+            # Highlight only the Pick column if game is concluded
+            def highlight_pick_only(row):
+                colors = ["", ""]
+                if game_name in concluded_games:
+                    if row["result"] == "correct":
+                        colors[1] = "background-color: rgba(34,197,94,0.25);"  # green
+                    elif row["result"] == "incorrect":
+                        colors[1] = "background-color: rgba(239,68,68,0.25);"  # red
+                    elif row["result"] == "push":
+                        colors[1] = "background-color: rgba(251,191,36,0.25);"  # yellow
+                return colors + [""]
+
+            display_df = display_df.reset_index(drop=True)
+            styled = display_df[["User", "Pick", "result"]].reset_index(drop=True).style.apply(highlight_pick_only, axis=1)
+            st.dataframe(
+                styled,
+                use_container_width=True,
+                column_order=["User", "Pick"]
+            )
+        else:
+            st.write("No picks submitted for this game.")
+        st.write("---")
+
+    # 3. Upcoming Games (not started yet)
     if weekly_games:
-        for g in weekly_games:
-            commence_time_str = g.get("commence_time", None)
-            game_started = game_has_started(commence_time_str) if commence_time_str else False
-
-            if game_started:
+        upcoming_games = [g for g in weekly_games if not game_has_started(g.get("commence_time", ""))]
+        if upcoming_games:
+            st.subheader("🔒 Upcoming Games")
+            st.write("Picks will be revealed when these games start:")
+            for g in upcoming_games:
+                # Format as "Chiefs @ Chargers"
                 if "@" in g["game"]:
                     away_team, home_team = g["game"].split(" @ ")
                 else:
                     home_team, away_team = g["game"].split(" vs. ")
                 away_display = TEAM_DISPLAY_NAMES.get(away_team, away_team)
                 home_display = TEAM_DISPLAY_NAMES.get(home_team, home_team)
-                st.write(f"• {away_display} @ {home_display}")
-
-                # Get all picks for this game
-                game_picks = current_week_picks[current_week_picks["game"] == g["game"]]
-                if not game_picks.empty:
-                    results_df = pd.read_csv(RESULTS_FILE)
-                    scored_picks = score_all_picks(game_picks, results_df)
-                    # Format pick with spread for each user
-                    scored_picks["Pick"] = scored_picks.apply(
-                        lambda row: format_pick_with_spread(row["pick"], row["spread"], row["game"]), axis=1
-                    )
-                    scored_picks["Result"] = scored_picks["result"].apply(result_to_emoji)
-                    display_df = scored_picks[["user", "Pick", "Result"]].rename(columns={"user": "User"})
-                    display_df = display_df.sort_values("User")
-                    st.dataframe(
-                        display_df,
-                        use_container_width=True,
-                        hide_index=True
-                    )
-                else:
-                    st.write("No picks submitted for this game.")
-
-                st.write("---")
-
-        # Show upcoming games (not started yet)
-        upcoming_games = [g for g in weekly_games if not game_has_started(g.get("commence_time", ""))]
-        if upcoming_games:
-            st.subheader("🔒 Upcoming Games")
-            st.write("Picks will be revealed when these games start:")
-            for g in upcoming_games:
-                formatted_game = format_game_with_spread(g["game"], g["spread"])
-                st.write(f"• {formatted_game}")
-
-        # Summary Table for Concluded Games
-        results_df = pd.read_csv(RESULTS_FILE)
-        concluded_games = set(results_df["game"])
-        week_picks = current_week_picks[current_week_picks["game"].isin(concluded_games)]
-        if not week_picks.empty:
-            scored_picks = score_all_picks(week_picks, results_df)
-            summary = (
-                scored_picks.groupby("user")["result"]
-                .apply(lambda x: (x == "correct").sum())
-                .reset_index(name="correct")
-            )
-            summary["total"] = scored_picks.groupby("user")["result"].count().values
-            summary["correct_pct"] = summary["correct"] / summary["total"] * 100
-            summary = summary.rename(columns={
-                "user": "User",
-                "correct": "Correct Picks",
-                "correct_pct": "Correct Pick %",
-                "total": "Total Picks"
-            })
-            summary = summary.sort_values("User")
-            summary["Correct Pick %"] = summary["Correct Pick %"].apply(lambda x: f"{x:.1f}%")
-            st.subheader("Summary Table (Concluded Games Only)")
-            st.dataframe(
-                summary[["User", "Correct Picks", "Total Picks", "Correct Pick %"]],
-                use_container_width=True,
-                hide_index=True
-            )
-        else:
-            st.write("No concluded games available for this week.")
-    else:
-        st.write("No games available for this week.")
+                display_game = f"{away_display} @ {home_display}"
+                st.write(f"• {display_game}")
 
 
 def render_group_data_tab(picks_df):
@@ -529,7 +569,7 @@ def render_group_data_tab(picks_df):
         
         if not completed_picks.empty:
             # Most commonly picked teams
-            st.subheader("📈 Most Picked Teams (Completed Games)")
+            st.subheader("📈 Most Picked Teams")
             team_picks = completed_picks.groupby("pick").size().reset_index(name="count")
             top_teams = team_picks.nlargest(5, "count")
             
@@ -564,7 +604,7 @@ def render_group_data_tab(picks_df):
             st.plotly_chart(fig, use_container_width=True, key="most_picked")
             
             # Least commonly picked teams
-            st.subheader("📉 Least Picked Teams (Completed Games)")
+            st.subheader("📉 Least Picked Teams")
             bottom_teams = team_picks.nsmallest(5, "count")
             
             # Get display names and colors for bottom teams
