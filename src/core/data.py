@@ -166,12 +166,10 @@ class NFLData:
     
     def get_game_results(self, week: int, use_demo: bool = False) -> List[Dict]:
         """
-        Get processed game results including cover determination.
-        
+        Get processed game results (final scores only).
         Args:
             week: NFL week number
             use_demo: Whether to use demo data instead of live API
-            
         Returns:
             List of dictionaries containing game results
         """
@@ -189,75 +187,52 @@ class NFLData:
                 except Exception as e:
                     logger.error(f"Error reading demo results: {str(e)}")
                     return []
-            
+
             # Use live API data
             scores_data = self.api.get_game_scores()
             results_list = []
-            
-            # Get spreads for comparison
-            spreads = self.get_weekly_spreads(week)
-            spreads_dict = {game['game']: game['spread'] for game in spreads}
-            
+
             for game in scores_data:
                 try:
-                    game_key = f"{game['away_team']} @ {game['home_team']}"
-                    if game_key not in spreads_dict:
-                        logger.warning(f"No spread found for game: {game_key}")
+                    # Only process games from the correct week
+                    game_week = assign_week(game.get('commence_time'))
+                    if game_week != week:
                         continue
-                        
+
+                    home_team = game['home_team']
+                    away_team = game['away_team']
                     home_score = game.get('scores_home')
                     away_score = game.get('scores_away')
-                    
+                    game_key = f"{away_team} @ {home_team}"
+
                     if None in (home_score, away_score):
                         logger.warning(f"Missing scores for game: {game_key}")
                         continue
-                        
-                    score_diff = home_score - away_score
-                    spread = spreads_dict[game_key]
-                    
-                    logger.info(f"""
-                    Cover Determination:
-                    - Game: {game_key}
-                    - Score: {home_score}-{away_score} (diff: {score_diff})
-                    - Spread: {spread}
-                    - Home team is {'favorite' if spread < 0 else 'underdog'}
-                    """)
-                    
-                    # Check for push
-                    if abs(score_diff) == abs(spread):
-                        covered = "PUSH"
-                        logger.info("Result: PUSH")
-                    else:
-                        if spread < 0:  # Home team is favorite
-                            covered = game['home_team'] if score_diff > abs(spread) else game['away_team']
-                        else:  # Home team is underdog
-                            covered = game['home_team'] if score_diff > spread else game['away_team']
-                        logger.info(f"Result: {covered} covered")
 
                     results_list.append({
                         "week": week,
                         "game": game_key,
-                        "covered": covered,
+                        "home_team": home_team,
+                        "away_team": away_team,
                         "home_score": home_score,
                         "away_score": away_score,
-                        "spread": spread
                     })
-                        
+
                 except Exception as e:
                     logger.error(f"Error processing game result: {str(e)}")
                     continue
-                    
+
             # Save results to CSV if any games were processed
             if results_list:
                 try:
                     df = pd.DataFrame(results_list)
-                    df.to_csv(self.results_file, mode='a', header=not self.results_file.exists(), index=False)
+                    df.to_csv(self.results_file, mode='w', header=True, index=False)
                     logger.info(f"Saved {len(results_list)} results to {self.results_file}")
                 except Exception as e:
                     logger.error(f"Error saving results to CSV: {str(e)}")
-            
+
             return results_list
-                
+
         except Exception as e:
             logger.error(f"Error getting game results: {str(e)}")
             return []
