@@ -404,7 +404,7 @@ def render_group_picks_tab(picks_df):
         })
         summary = summary.sort_values("User")
         summary["Correct Pick %"] = summary["Correct Pick %"].apply(lambda x: f"{x:.1f}%")
-        st.subheader("Summary Table (Concluded Games Only)")
+        st.subheader("Summary Table")
         st.dataframe(
             summary[["User", "Correct Picks", "Total Picks", "Correct Pick %"]],
             use_container_width=True,
