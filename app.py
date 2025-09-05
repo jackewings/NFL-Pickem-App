@@ -598,11 +598,13 @@ def render_group_data_tab(picks_df):
             st.plotly_chart(fig, use_container_width=True, key="least_picked")
 
             scored_picks = score_all_picks(picks_df, results_df)
+            completed_picks = scored_picks[scored_picks['result'].isin(['correct', 'incorrect', 'push'])]
+
             ats_records = pd.DataFrame()
             for team in NFL_TEAM_COLORS.keys():
                 # Count how many times this team was the correct pick (covered)
-                games_covered = ((scored_picks['pick'] == team) & (scored_picks['result'] == 'correct')).sum()
-                total_games = (scored_picks['pick'] == team).sum()
+                games_covered = ((completed_picks['pick'] == team) & (completed_picks['result'] == 'correct')).sum()
+                total_games = (completed_picks['pick'] == team).sum()
                 if total_games > 0:
                     ats_records = pd.concat([ats_records, pd.DataFrame({
                         'team': [team],
