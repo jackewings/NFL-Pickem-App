@@ -31,13 +31,13 @@ jobs:
       - name: Update data
         env:
           API_KEY: ${{ secrets.API_KEY }}
-        run: python src/core/update_data.py
+        run: python -m src/core/update_data
 
       - name: Manual update
         if: github.event_name == 'workflow_dispatch'
         env:
           API_KEY: ${{ secrets.API_KEY }}
-        run: python src/core/update_data.py
+        run: python -m src/core/update_data
 
       - name: Commit and push if changed
         run: |
