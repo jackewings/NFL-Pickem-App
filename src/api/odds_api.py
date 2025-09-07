@@ -78,6 +78,7 @@ class OddsAPI:
             response = requests.get(url, params=params)
             response.raise_for_status()
             data = response.json()
+            print("DEBUG: Raw scores data:", json.dumps(data, indent=2))
             
             processed_data = []
             for game in data:
