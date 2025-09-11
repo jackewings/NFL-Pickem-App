@@ -848,21 +848,25 @@ def render_group_data_tab(picks_df):
 def render_leaderboards_tab(picks_df):
     """Render the Leaderboards tab content"""
     st.header("Leaderboards")
-
+    st.subheader("🏆 Weekly Leaderboard")
     if results_available:
         results_df = pd.read_csv(RESULTS_FILE)
         concluded_games = set(results_df["game"])
         scored_picks = score_all_picks(picks_df, results_df)
         completed_picks = scored_picks[scored_picks["game"].isin(concluded_games)]
-        
-        # Weekly leaderboard
-        st.subheader("🏆 Weekly Leaderboard")
+
+        # Add week selector
+        week_options = sorted(completed_picks["week"].unique(), reverse=True)
+        selected_week = st.selectbox("Select Week:", week_options, key="leaderboard_week")
+
+        # Filter by selected week
         weekly = (
-            completed_picks.groupby(["week", "user"])["result"]
+            completed_picks[completed_picks["week"] == selected_week]
+            .groupby(["week", "user"])["result"]
             .apply(lambda x: (x == "correct").sum())
             .reset_index(name="correct")
         )
-        weekly["total"] = completed_picks.groupby(["week", "user"])["result"].count().values
+        weekly["total"] = completed_picks[completed_picks["week"] == selected_week].groupby(["week", "user"])["result"].count().values
         weekly["correct_pct"] = weekly["correct"] / weekly["total"] * 100
         weekly = add_rank(weekly, ["correct", "correct_pct"])
         weekly["correct_pct"] = weekly["correct_pct"].apply(lambda x: f"{x:.1f}%")
