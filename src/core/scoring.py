@@ -149,30 +149,29 @@ def score_user_pick(pick_row, results_df):
     if result_row.empty:
         return None  
 
-    home_team = pick_row["game"].split(" @ ")[1]
-    away_team = pick_row["game"].split(" @ ")[0]
-    home_score = result_row.iloc[0].get("home_score")
-    away_score = result_row.iloc[0].get("away_score")
+    home_team = result_row.iloc[0]["home_team"]
+    away_team = result_row.iloc[0]["away_team"]
+    home_score = result_row.iloc[0]["home_score"]
+    away_score = result_row.iloc[0]["away_score"]
     spread = float(pick_row["spread"])
     pick = pick_row["pick"]
 
     if home_score is None or away_score is None:
         return None
 
-    # Calculate margin
-    margin = home_score - away_score
-
-    # Determine which team covered the spread
-    if spread < 0:
-        covered = home_team if margin > abs(spread) else away_team
+    # User picked home team
+    if pick == home_team:
+        margin = home_score - away_score + spread
+    # User picked away team
+    elif pick == away_team:
+        margin = away_score - home_score - spread
     else:
-        covered = home_team if margin > spread else away_team
+        return None
 
-    # Push logic
-    if abs(margin) == abs(spread):
-        return "push"
-    elif pick == covered:
+    if margin > 0:
         return "correct"
+    elif margin == 0:
+        return "push"
     else:
         return "incorrect"
     

@@ -156,11 +156,17 @@ class NFLData:
             return []
 
     def _save_spreads_to_csv(self, spreads_list: List[Dict]) -> None:
-        """Save spreads data to CSV file"""
+        """Append new spreads to CSV file, keeping all historical games."""
         try:
-            df = pd.DataFrame(spreads_list)
-            df.to_csv(self.spreads_file, index=False)
-            logger.info(f"Saved {len(spreads_list)} games to {self.spreads_file}")
+            new_df = pd.DataFrame(spreads_list)
+            if self.spreads_file.exists():
+                old_df = pd.read_csv(self.spreads_file)
+                # Combine and drop duplicates based on week+game
+                combined = pd.concat([old_df, new_df]).drop_duplicates(subset=["week", "game"], keep="last")
+            else:
+                combined = new_df
+            combined.to_csv(self.spreads_file, index=False)
+            logger.info(f"Saved {len(combined)} total games to {self.spreads_file}")
         except Exception as e:
             logger.error(f"Error saving spreads to CSV: {str(e)}")
     

@@ -70,14 +70,14 @@ class OddsAPI:
         """Fetch game scores from The Odds API"""
         url = f"{self.base_url}/sports/{sport_key}/scores"
         params = {
-            "apiKey": self.api_key,
-            "daysFrom": 3
+            "apiKey": self.api_key
         }
         
         try:
             response = requests.get(url, params=params)
             response.raise_for_status()
             data = response.json()
+            print(json.dumps(data, indent=2))
             processed_data = []
             for game in data:
                 if game.get('completed', False) and 'scores' in game:
