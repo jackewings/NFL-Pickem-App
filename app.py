@@ -14,7 +14,7 @@ from src.core.data import nfl_data
 from src.core import scoring
 from src.config.settings import (
     DATA_DIR,
-    CURRENT_WEEK,
+    get_current_week,
     USERS,
     NFL_TEAM_COLORS,
     TEAM_NAME_MAPPING,
@@ -182,6 +182,54 @@ def get_team_display_and_color(team):
     
     return display_name, color
 
+def get_user_ats_records(picks_df, results_df):
+    """
+    Returns a DataFrame with columns: team, covered, total, pct
+    For each team, counts how many times users picked them and their pick covered using their own spread.
+    """
+    # Merge picks with results to get scores for each pick
+    merged = picks_df.merge(results_df, on=["week", "game"], how="left")
+    ats = {}
+    for _, row in merged.iterrows():
+        pick_team = row["pick"]
+        try:
+            spread = float(row["spread"])
+            home_team = row["home_team"]
+            away_team = row["away_team"]
+            home_score = float(row["home_score"])
+            away_score = float(row["away_score"])
+        except Exception:
+            continue  # skip if any data is missing
+
+        # Determine if pick_team is home or away
+        if pick_team == home_team:
+            margin = home_score - away_score + spread
+        elif pick_team == away_team:
+            margin = away_score - home_score - spread
+        else:
+            continue  # skip if pick_team doesn't match
+
+        # Did the pick cover?
+        covered = margin > 0
+        push = margin == 0
+
+        if pick_team not in ats:
+            ats[pick_team] = {"covered": 0, "total": 0, "push": 0}
+        ats[pick_team]["total"] += 1
+        if covered:
+            ats[pick_team]["covered"] += 1
+        elif push:
+            ats[pick_team]["push"] += 1
+
+    # Build DataFrame
+    data = []
+    for team, stats in ats.items():
+        total = stats["total"]
+        covered = stats["covered"]
+        pct = covered / total if total > 0 else 0.0
+        data.append({"team": team, "covered": covered, "total": total, "pct": pct})
+    return pd.DataFrame(data)
+
 def format_spread(spread):
     """Format spread with proper + sign for positive values"""
     return f"+{spread}" if spread > 0 else str(spread)
@@ -211,14 +259,15 @@ def format_game_with_spread(game, spread):
 
 def render_make_picks_tab(user, picks_df, weekly_games):
     """Render the Make Picks tab content"""
-    st.header(f"Week {CURRENT_WEEK} Picks — {user}")
+    current_week = get_current_week()
+    st.header(f"Week {current_week} Picks — {user}")
     
     if weekly_games and len(weekly_games) > 0:
         if "last_updated" in weekly_games[0]:
             last_updated = datetime.fromisoformat(weekly_games[0]["last_updated"])
             st.caption(f"Lines last updated: {format_display_time(last_updated)}")
             
-        user_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == CURRENT_WEEK)]
+        user_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == current_week)]
         session_picks = []
         for g in weekly_games:
             formatted_game = format_game_with_spread(g["game"], g["spread"])
@@ -264,7 +313,7 @@ def render_make_picks_tab(user, picks_df, weekly_games):
                 # Convert display name back to full name for storage
                 selected_full = teams_full[teams_display.index(selected_display)]
                 session_picks.append({
-                    "week": CURRENT_WEEK,
+                    "week": current_week,
                     "user": user,
                     "game": g["game"],
                     "spread": g["spread"],
@@ -278,12 +327,12 @@ def render_make_picks_tab(user, picks_df, weekly_games):
             if st.button("Submit Picks"):
                 # Keep existing picks for games that are locked/concluded (not in weekly_games)
                 locked_games = picks_df[
-                    (picks_df["week"] == CURRENT_WEEK) &
+                    (picks_df["week"] == current_week) &
                     (picks_df["user"] == user) &
                     (~picks_df["game"].isin([g["game"] for g in weekly_games]))
                 ]
                 new_picks_df = pd.concat([
-                    picks_df[~((picks_df["week"] == CURRENT_WEEK) & (picks_df["user"] == user))],
+                    picks_df[~((picks_df["week"] == current_week) & (picks_df["user"] == user))],
                     pd.DataFrame(session_picks),
                     locked_games
                 ], ignore_index=True)
@@ -298,7 +347,7 @@ def render_make_picks_tab(user, picks_df, weekly_games):
                     st.rerun()
             else:
                 if st.button("Confirm Reset"):
-                    new_picks_df = picks_df[~((picks_df["week"] == CURRENT_WEEK) & (picks_df["user"] == user))]
+                    new_picks_df = picks_df[~((picks_df["week"] == current_week) & (picks_df["user"] == user))]
                     save_picks(new_picks_df)
                     st.session_state.show_reset_confirm = False
                     st.success("🔄 Picks reset successfully!")
@@ -308,7 +357,7 @@ def render_make_picks_tab(user, picks_df, weekly_games):
                     st.rerun()
 
     st.subheader("Your Picks This Week")
-    current_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == CURRENT_WEEK)]
+    current_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == current_week)]
     if not current_picks.empty:
         # Create display DataFrame with formatted games
         current_picks_display = current_picks.copy()
@@ -330,14 +379,15 @@ def render_make_picks_tab(user, picks_df, weekly_games):
     else:
         st.write("No picks submitted yet.")
 
-def render_past_picks_tab(picks_df):
+def render_past_picks_tab(picks_df, user):
     """Render the Past Picks tab content"""
     st.header("Past Picks")
 
-# Filter controls - only show weeks prior to current week
+    # Filter controls - only show weeks prior to current week
+    current_week = get_current_week()
     col1, col2 = st.columns(2)
     with col1:
-        available_weeks = sorted([w for w in picks_df["week"].unique() if w < CURRENT_WEEK]) if not picks_df.empty else []
+        available_weeks = sorted([w for w in picks_df["week"].unique() if w < current_week]) if not picks_df.empty else []
         if available_weeks:
             selected_week = st.selectbox("Select Week:", available_weeks)
         else:
@@ -380,8 +430,9 @@ def render_group_picks_tab(picks_df):
     st.write("View everyone's picks for games that have already started or concluded.")
 
     # Get current week games and picks
-    weekly_games = nfl_data.get_weekly_spreads(CURRENT_WEEK)
-    current_week_picks = picks_df[picks_df["week"] == CURRENT_WEEK]
+    current_week = get_current_week()
+    weekly_games = nfl_data.get_weekly_spreads(current_week)
+    current_week_picks = picks_df[picks_df["week"] == current_week]
     results_df = pd.read_csv(RESULTS_FILE)
     concluded_games = set(results_df["game"])
     scored_picks = score_all_picks(current_week_picks, results_df)
@@ -567,155 +618,147 @@ def render_group_data_tab(picks_df):
         completed_picks = score_all_picks(picks_df, results_df)
         completed_picks = completed_picks[completed_picks['result'].isin(['correct', 'incorrect', 'push'])]
         
-        if not completed_picks.empty:
-            # Most commonly picked teams
-            st.subheader("📈 Most Picked Teams")
-            team_picks = completed_picks.groupby("pick").size().reset_index(name="count")
-            top_teams = team_picks.nlargest(5, "count")
-            
-            # Get display names and colors for teams
-            display_names = []
-            colors = []
-            for team in top_teams["pick"]:
-                display_name, color = get_team_display_and_color(team)
-                display_names.append(display_name)
-                colors.append(color)
-            
-            fig = go.Figure(data=[
-                go.Bar(
-                    x=display_names,
-                    y=top_teams["count"],
-                    marker_color=colors,
-                    text=top_teams["count"],
-                    textposition='auto',
-                )
-            ])
-            fig.update_layout(
-                yaxis=dict(
-                    tickformat="d",
-                    dtick=1,
-                    tick0=0,
-                    showgrid=True
-                ),
-                showlegend=False,
-                yaxis_title="Times Picked",
-                dragmode=False
-            )
-            st.plotly_chart(fig, use_container_width=True, key="most_picked")
-            
-            # Least commonly picked teams
-            st.subheader("📉 Least Picked Teams")
-            bottom_teams = team_picks.nsmallest(5, "count")
-            
-            # Get display names and colors for bottom teams
-            display_names = []
-            colors = []
-            for team in bottom_teams["pick"]:
-                display_name, color = get_team_display_and_color(team)
-                display_names.append(display_name)
-                colors.append(color)
-            
-            fig = go.Figure(data=[
-                go.Bar(
-                    x=display_names,
-                    y=bottom_teams["count"],
-                    marker_color=colors,
-                    text=bottom_teams["count"],
-                    textposition='auto',
-                )
-            ])
-            fig.update_layout(
-                yaxis=dict(
-                    tickformat="d",
-                    dtick=1,
-                    tick0=0,
-                    showgrid=True
-                ),
-                showlegend=False,
-                yaxis_title="Times Picked",
-                dragmode=False
-            )
-            st.plotly_chart(fig, use_container_width=True, key="least_picked")
+        # --- NEW: Find all teams that have played in completed games ---
+        teams_played = set()
+        for game in results_df["game"]:
+            if "@" in game:
+                away, home = game.split(" @ ")
+            else:
+                home, away = game.split(" vs. ")
+            teams_played.update([away.strip(), home.strip()])
 
-            scored_picks = score_all_picks(picks_df, results_df)
-            completed_picks = scored_picks[scored_picks['result'].isin(['correct', 'incorrect', 'push'])]
+        # --- Most Picked Teams ---
+        st.subheader("📈 Most Picked Teams")
+        team_picks = completed_picks.groupby("pick").size().reindex(teams_played, fill_value=0).reset_index()
+        team_picks.columns = ["pick", "count"]
+        top_teams = team_picks.nlargest(5, "count")
+        
+        display_names = []
+        colors = []
+        for team in top_teams["pick"]:
+            display_name, color = get_team_display_and_color(team)
+            display_names.append(display_name)
+            colors.append(color)
+        
+        fig = go.Figure(data=[
+            go.Bar(
+                x=display_names,
+                y=top_teams["count"],
+                marker_color=colors,
+                text=top_teams["count"],
+                textposition='auto',
+            )
+        ])
+        fig.update_layout(
+            yaxis=dict(
+                tickformat="d",
+                dtick=1,
+                tick0=0,
+                showgrid=True
+            ),
+            showlegend=False,
+            yaxis_title="Times Picked",
+            dragmode=False
+        )
+        st.plotly_chart(fig, use_container_width=True, key="most_picked")
+        
+        # --- Least Picked Teams ---
+        st.subheader("📉 Least Picked Teams")
+        bottom_teams = team_picks.nsmallest(5, "count")
+        
+        display_names = []
+        colors = []
+        for team in bottom_teams["pick"]:
+            display_name, color = get_team_display_and_color(team)
+            display_names.append(display_name)
+            colors.append(color)
+        
+        fig = go.Figure(data=[
+            go.Bar(
+                x=display_names,
+                y=bottom_teams["count"],
+                marker_color=colors,
+                text=bottom_teams["count"],
+                textposition='auto',
+            )
+        ])
+        fig.update_layout(
+            yaxis=dict(
+                tickformat="d",
+                dtick=1,
+                tick0=0,
+                showgrid=True
+            ),
+            showlegend=False,
+            yaxis_title="Times Picked",
+            dragmode=False
+        )
+        st.plotly_chart(fig, use_container_width=True, key="least_picked")
 
-            ats_records = pd.DataFrame()
-            for team in NFL_TEAM_COLORS.keys():
-                # Count how many times this team was the correct pick (covered)
-                games_covered = ((completed_picks['pick'] == team) & (completed_picks['result'] == 'correct')).sum()
-                total_games = (completed_picks['pick'] == team).sum()
-                if total_games > 0:
-                    ats_records = pd.concat([ats_records, pd.DataFrame({
-                        'team': [team],
-                        'covered': [games_covered],
-                        'total': [total_games],
-                        'pct': [games_covered/total_games]
-                    })])
-            
-            # Hot teams
-            st.subheader("🔥 Best Teams Against the Spread")
-            hot_teams = ats_records.nlargest(5, 'pct')
-            
-            # Get display names and colors for hot teams
-            display_names = []
-            colors = []
-            for team in hot_teams["team"]:
-                display_name, color = get_team_display_and_color(team)
-                display_names.append(display_name)
-                colors.append(color)
-            
-            fig = go.Figure(data=[
-                go.Bar(
-                    x=display_names,
-                    y=hot_teams["pct"].multiply(100),
-                    marker_color=colors,
-                    text=hot_teams["pct"].apply(lambda x: f"{x*100:.1f}%"),
-                    textposition='auto',
-                )
-            ])
-            fig.update_layout(
-                yaxis=dict(
-                    tickformat=".0f",
-                    range=[0, 100],
-                    title="Cover %"
-                ),
-                dragmode=False,
-                showlegend=False
+        # --- ATS Records ---
+        ats_records = get_user_ats_records(picks_df, results_df)
+
+        # Hot teams
+        st.subheader("🔥 Best Teams Against the Spread (User Picks)")
+        hot_teams = ats_records.nlargest(5, 'pct')
+
+        display_names = []
+        colors = []
+        for team in hot_teams["team"]:
+            display_name, color = get_team_display_and_color(team)
+            display_names.append(display_name)
+            colors.append(color)
+
+        fig = go.Figure(data=[
+            go.Bar(
+                x=display_names,
+                y=hot_teams["pct"].multiply(100),
+                marker_color=colors,
+                text=hot_teams["pct"].apply(lambda x: f"{x*100:.1f}%"),
+                textposition='auto',
             )
-            st.plotly_chart(fig, use_container_width=True)
-            
-            # Cold teams
-            st.subheader("❄️ Worst Teams Against the Spread")
-            cold_teams = ats_records.nsmallest(5, 'pct')
-            
-            # Get display names and colors for cold teams
-            display_names = []
-            colors = []
-            for team in cold_teams["team"]:
-                display_name, color = get_team_display_and_color(team)
-                display_names.append(display_name)
-                colors.append(color)
-            
-            fig = go.Figure(data=[
-                go.Bar(
-                    x=display_names,
-                    y=cold_teams["pct"].multiply(100),
-                    marker_color=colors,
-                    text=cold_teams["pct"].apply(lambda x: f"{x*100:.1f}%"),
-                    textposition='auto',
-                )
-            ])
-            fig.update_layout(
-                yaxis=dict(
-                    tickformat=".0f",
-                    range=[0, 100],
-                    title="Cover %"
-                ),
-                dragmode=False,
-                showlegend=False
+        ])
+        fig.update_layout(
+            yaxis=dict(
+                tickformat=".0f",
+                range=[0, 100],
+                title="Cover %"
+            ),
+            dragmode=False,
+            showlegend=False
+        )
+        st.plotly_chart(fig, use_container_width=True, key="best_ats_user")
+
+        # Cold teams
+        st.subheader("❄️ Worst Teams Against the Spread (User Picks)")
+        cold_teams = ats_records.nsmallest(5, 'pct')
+
+        display_names = []
+        colors = []
+        for team in cold_teams["team"]:
+            display_name, color = get_team_display_and_color(team)
+            display_names.append(display_name)
+            colors.append(color)
+
+        fig = go.Figure(data=[
+            go.Bar(
+                x=display_names,
+                y=cold_teams["pct"].multiply(100),
+                marker_color=colors,
+                text=cold_teams["pct"].apply(lambda x: f"{x*100:.1f}%"),
+                textposition='auto',
             )
-            st.plotly_chart(fig, use_container_width=True)
+        ])
+        fig.update_layout(
+            yaxis=dict(
+                tickformat=".0f",
+                range=[0, 100],
+                title="Cover %"
+            ),
+            dragmode=False,
+            showlegend=False
+        )
+        st.plotly_chart(fig, use_container_width=True, key="worst_ats_user")
 
 def render_leaderboards_tab(picks_df):
     """Render the Leaderboards tab content"""
@@ -846,10 +889,11 @@ def render_live_mode():
 
     # Render each tab
     with tabs[0]:
-        render_make_picks_tab(user, picks_df, nfl_data.get_weekly_spreads(CURRENT_WEEK))
+        current_week = get_current_week()
+        render_make_picks_tab(user, picks_df, nfl_data.get_weekly_spreads(current_week))
     
     with tabs[1]:
-        render_past_picks_tab(picks_df)
+        render_past_picks_tab(picks_df, user)
     
     with tabs[2]:
         render_group_picks_tab(picks_df)
