@@ -257,6 +257,93 @@ def format_game_with_spread(game, spread):
     
     return f"{away_display} ({formatted_away_spread}) @ {home_display}"
 
+def format_pick_with_spread_for_past_picks(row):
+    pick_team = TEAM_DISPLAY_NAMES.get(row["pick"], row["pick"])
+    try:
+        spread = float(row["spread"])
+        # Determine if pick is home or away
+        if "@" in row["game"]:
+            away_team, home_team = row["game"].split(" @ ")
+        else:
+            home_team, away_team = row["game"].split(" vs. ")
+        away_team = away_team.strip()
+        home_team = home_team.strip()
+        if row["pick"] == away_team:
+            pick_spread = -spread
+        elif row["pick"] == home_team:
+            pick_spread = spread
+        else:
+            pick_spread = spread
+        sign = "+" if pick_spread > 0 else ""
+        return f"{pick_team} ({sign}{pick_spread:.1f})"
+    except Exception:
+        return pick_team
+
+def render_update_results_tab():
+    st.header("Update Results (Manual Entry)")
+
+    # Select week
+    current_week = get_current_week()
+    week_options = list(range(1, current_week + 1))
+    selected_week = st.selectbox("Select Week to Update:", week_options, index=len(week_options)-1)
+
+    # Load weekly spreads and existing results
+    weekly_spreads = pd.read_csv(Path(DATA_DIR) / "weekly_spreads.csv")
+    week_games = weekly_spreads[weekly_spreads["week"] == selected_week]
+    results_path = Path(DATA_DIR) / "results.csv"
+    if results_path.exists():
+        results_df = pd.read_csv(results_path)
+    else:
+        results_df = pd.DataFrame(columns=["week", "game", "home_team", "away_team", "home_score", "away_score"])
+
+    # Build form for each game
+    updated_rows = []
+    with st.form("update_results_form"):
+        st.write(f"Enter final scores for Week {selected_week} games. Leave blank for games not completed yet.")
+        for i, row in week_games.iterrows():
+            game = row["game"]
+            home_team = row["home_team"]
+            away_team = row["away_team"]
+
+            # Check if result already exists
+            existing = results_df[(results_df["week"] == selected_week) & (results_df["game"] == game)]
+            home_score = existing["home_score"].values[0] if not existing.empty else ""
+            away_score = existing["away_score"].values[0] if not existing.empty else ""
+
+            st.subheader(f"{away_team} @ {home_team}")
+            col1, col2 = st.columns(2)
+            with col1:
+                home_input = st.text_input(f"{home_team} Score", value=str(home_score), key=f"{game}_home")
+            with col2:
+                away_input = st.text_input(f"{away_team} Score", value=str(away_score), key=f"{game}_away")
+
+            # Only add if either score is entered
+            if home_input.strip() != "" or away_input.strip() != "":
+                try:
+                    home_val = int(home_input)
+                    away_val = int(away_input)
+                    updated_rows.append({
+                        "week": selected_week,
+                        "game": game,
+                        "home_team": home_team,
+                        "away_team": away_team,
+                        "home_score": home_val,
+                        "away_score": away_val
+                    })
+                except ValueError:
+                    st.warning(f"Scores for {game} must be integers.")
+
+        submitted = st.form_submit_button("Save Results")
+        if submitted:
+            # Remove existing results for these games in this week
+            for row in updated_rows:
+                results_df = results_df[~((results_df["week"] == row["week"]) & (results_df["game"] == row["game"]))]
+            # Append new/updated results
+            results_df = pd.concat([results_df, pd.DataFrame(updated_rows)], ignore_index=True)
+            results_df = results_df.sort_values(["week", "game"])
+            results_df.to_csv(results_path, index=False)
+            st.success("Results updated!")
+
 def render_make_picks_tab(user, picks_df, weekly_games):
     """Render the Make Picks tab content"""
     current_week = get_current_week()
@@ -409,9 +496,7 @@ def render_past_picks_tab(picks_df, user):
                 lambda row: format_game_with_spread(row["game"], row["spread"]), 
                 axis=1
             )
-            scored_picks["pick"] = scored_picks["pick"].apply(
-                lambda x: TEAM_DISPLAY_NAMES.get(x, x)
-            )
+            scored_picks["pick"] = scored_picks.apply(format_pick_with_spread_for_past_picks, axis=1)
             scored_picks["Result"] = scored_picks["result"].apply(result_to_emoji)
             st.table(
                 scored_picks[["formatted_game", "pick", "Result"]].rename(columns={
@@ -884,7 +969,7 @@ def render_live_mode():
 
     # Only shown after successful authentication
     user = st.session_state.user
-    tabs = st.tabs(["Make Picks", "Past Picks", "Group Picks", "Group Data", "Leaderboards"])
+    tabs = st.tabs(["Make Picks", "Past Picks", "Group Picks", "Group Data", "Leaderboards", "Update Results"])
     picks_df = load_picks()
 
     # Render each tab
@@ -903,6 +988,8 @@ def render_live_mode():
     
     with tabs[4]:
         render_leaderboards_tab(picks_df)
+    with tabs[5]:
+        render_update_results_tab()
 
 def render_demo_mode():
     """Render the demo mode content"""
