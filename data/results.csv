@@ -1,17 +1,18 @@
 week,game,home_team,away_team,home_score,away_score
-1,Dallas Cowboys @ Philadelphia Eagles,Philadelphia Eagles,Dallas Cowboys,24,20
-1,Kansas City Chiefs @ Los Angeles Chargers,Los Angeles Chargers,Kansas City Chiefs,27,21
-1,Tampa Bay Buccaneers @ Atlanta Falcons,Atlanta Falcons,Tampa Bay Buccaneers,20,23
-1,Cincinnati Bengals @ Cleveland Browns,Cleveland Browns,Cincinnati Bengals,16,17
-1,Miami Dolphins @ Indianapolis Colts,Indianapolis Colts,Miami Dolphins,33,8
-1,Carolina Panthers @ Jacksonville Jaguars,Jacksonville Jaguars,Carolina Panthers,26,10
-1,Las Vegas Raiders @ New England Patriots,New England Patriots,Las Vegas Raiders,13,20
 1,Arizona Cardinals @ New Orleans Saints,New Orleans Saints,Arizona Cardinals,13,20
-1,Pittsburgh Steelers @ New York Jets,New York Jets,Pittsburgh Steelers,32,34
-1,New York Giants @ Washington Commanders,Washington Commanders,New York Giants,21,6
-1,Tennessee Titans @ Denver Broncos,Denver Broncos,Tennessee Titans,20,12
-1,San Francisco 49ers @ Seattle Seahawks,Seattle Seahawks,San Francisco 49ers,13,17
+1,Baltimore Ravens @ Buffalo Bills,Buffalo Bills,Baltimore Ravens,41,40
+1,Carolina Panthers @ Jacksonville Jaguars,Jacksonville Jaguars,Carolina Panthers,26,10
+1,Cincinnati Bengals @ Cleveland Browns,Cleveland Browns,Cincinnati Bengals,16,17
+1,Dallas Cowboys @ Philadelphia Eagles,Philadelphia Eagles,Dallas Cowboys,24,20
 1,Detroit Lions @ Green Bay Packers,Green Bay Packers,Detroit Lions,27,13
 1,Houston Texans @ Los Angeles Rams,Los Angeles Rams,Houston Texans,14,9
-1,Baltimore Ravens @ Buffalo Bills,Buffalo Bills,Baltimore Ravens,41,40
+1,Kansas City Chiefs @ Los Angeles Chargers,Los Angeles Chargers,Kansas City Chiefs,27,21
+1,Las Vegas Raiders @ New England Patriots,New England Patriots,Las Vegas Raiders,13,20
+1,Miami Dolphins @ Indianapolis Colts,Indianapolis Colts,Miami Dolphins,33,8
 1,Minnesota Vikings @ Chicago Bears,Chicago Bears,Minnesota Vikings,24,27
+1,New York Giants @ Washington Commanders,Washington Commanders,New York Giants,21,6
+1,Pittsburgh Steelers @ New York Jets,New York Jets,Pittsburgh Steelers,32,34
+1,San Francisco 49ers @ Seattle Seahawks,Seattle Seahawks,San Francisco 49ers,13,17
+1,Tampa Bay Buccaneers @ Atlanta Falcons,Atlanta Falcons,Tampa Bay Buccaneers,20,23
+1,Tennessee Titans @ Denver Broncos,Denver Broncos,Tennessee Titans,20,12
+2,Washington Commanders @ Green Bay Packers,Green Bay Packers,Washington Commanders,27,18
