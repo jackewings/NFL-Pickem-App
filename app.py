@@ -399,7 +399,7 @@ def render_make_picks_tab(user, picks_df, weekly_games):
                         else:
                             pick_spread_val = spread_val
                         sign = "+" if pick_spread_val > 0 else ""
-                        st.write(f"Your Pick: {pick_display} ({sign}{pick_spread_val:.1f})")
+                        st.write(f"Your Pick: {pick_display}")
                     except Exception:
                         st.write(f"Your Pick: {pick_display}")
                 else:
@@ -450,15 +450,19 @@ def render_make_picks_tab(user, picks_df, weekly_games):
                 col1, col2 = st.columns(2)
                 with col1:
                     if st.form_submit_button("Submit Picks"):
-                        locked_games_df = picks_df[
-                            (picks_df["week"] == current_week) &
-                            (picks_df["user"] == user) &
-                            (~picks_df["game"].isin([g["game"] for g in weekly_games]))
-                        ]
+
+                        # Get user's existing picks for the current week
+                        user_week_picks = picks_df[(picks_df["week"] == current_week) & (picks_df["user"] == user)]
+
+                        # For each locked game, keep the user's existing pick
+                        locked_picks = user_week_picks[user_week_picks["game"].isin([g["game"] for g in locked_games])]
+
+                        # For each open game, use the new pick from the form (session_picks)
+                        # Remove all of this user's picks for the current week, then add back locked and new picks
                         new_picks_df = pd.concat([
                             picks_df[~((picks_df["week"] == current_week) & (picks_df["user"] == user))],
                             pd.DataFrame(session_picks),
-                            locked_games_df
+                            locked_picks
                         ], ignore_index=True)
                         save_picks(new_picks_df)
                         st.success("✅ Picks submitted successfully!")
@@ -552,7 +556,7 @@ def render_group_picks_tab(picks_df):
     weekly_games = nfl_data.get_weekly_spreads(current_week)
     current_week_picks = picks_df[picks_df["week"] == current_week]
     results_df = pd.read_csv(RESULTS_FILE)
-    concluded_games = set(results_df["game"])
+    concluded_games = set(results_df[results_df["week"] == current_week]["game"])
     scored_picks = score_all_picks(current_week_picks, results_df)
 
     # 1. Summary Table for Concluded Games
