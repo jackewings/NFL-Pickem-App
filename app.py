@@ -357,9 +357,6 @@ def render_make_picks_tab(user, picks_df, weekly_games):
         user_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == current_week)]
         session_picks = []
         for g in weekly_games:
-            formatted_game = format_game_with_spread(g["game"], g["spread"])
-            st.write(formatted_game)
-            
             # Extract teams from game string
             if "@" in g["game"]:
                 away_team, home_team = g["game"].split(" @ ")
@@ -383,14 +380,31 @@ def render_make_picks_tab(user, picks_df, weekly_games):
             default_full = prev_pick[0] if len(prev_pick) else teams_full[0]
             default_display = TEAM_DISPLAY_NAMES.get(default_full, default_full)
             
+            formatted_game = format_game_with_spread(g["game"], g["spread"])
             if locked:
-                st.write(f"**{formatted_game}** — Locked (Game Started)")
+                st.write(f"**{formatted_game}** — 🔒 Game Locked")
                 if len(prev_pick):
-                    display_pick = TEAM_DISPLAY_NAMES.get(prev_pick[0], prev_pick[0])
-                    st.write(f"Your pick: {display_pick}")
+                    # Find the user's locked-in spread for this pick
+                    pick_row = user_picks[user_picks["game"] == g["game"]].iloc[0]
+                    pick_team = pick_row["pick"]
+                    pick_spread = pick_row["spread"]
+                    pick_display = TEAM_DISPLAY_NAMES.get(pick_team, pick_team)
+                    try:
+                        spread_val = float(pick_spread)
+                        if pick_team == away_full:
+                            pick_spread_val = -spread_val
+                        elif pick_team == home_full:
+                            pick_spread_val = spread_val
+                        else:
+                            pick_spread_val = spread_val
+                        sign = "+" if pick_spread_val > 0 else ""
+                        st.write(f"Your Pick: {pick_display} ({sign}{pick_spread_val:.1f})")
+                    except Exception:
+                        st.write(f"Your Pick: {pick_display}")
                 else:
                     st.write("No pick submitted.")
             else:
+                st.write(formatted_game)
                 selected_display = st.selectbox(
                     "Make your pick:",
                     teams_display,
