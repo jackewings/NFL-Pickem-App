@@ -372,7 +372,14 @@ def render_make_picks_tab(user, picks_df, weekly_games):
             st.subheader("🔒 Locked Games")
             st.write("---")
             for g in locked_games:
-                formatted_game = format_game_with_spread(g["game"], g["spread"])
+                prev_pick = user_picks[user_picks["game"] == g["game"]]["pick"].values
+                if len(prev_pick):
+                    pick_row = user_picks[user_picks["game"] == g["game"]].iloc[0]
+                    # Use the user's locked-in spread for display
+                    formatted_game = format_game_with_spread(g["game"], float(pick_row["spread"]))
+                else:
+                    # Fallback to live spread if no pick
+                    formatted_game = format_game_with_spread(g["game"], g["spread"])
                 st.markdown(f"**{formatted_game}**")
                 prev_pick = user_picks[user_picks["game"] == g["game"]]["pick"].values
                 away_team, home_team = g["game"].split(" @ ") if "@" in g["game"] else g["game"].split(" vs. ")
