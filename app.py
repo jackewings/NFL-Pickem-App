@@ -345,46 +345,40 @@ def render_update_results_tab():
             st.success("Results updated!")
 
 def render_make_picks_tab(user, picks_df, weekly_games):
-    """Render the Make Picks tab content"""
     current_week = get_current_week()
     st.header(f"Week {current_week} Picks — {user}")
-    
+
     if weekly_games and len(weekly_games) > 0:
         if "last_updated" in weekly_games[0]:
             last_updated = datetime.fromisoformat(weekly_games[0]["last_updated"])
             st.caption(f"Lines last updated: {format_display_time(last_updated)}")
-            
+
         user_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == current_week)]
         session_picks = []
+
+        # Separate locked and unlocked games
+        locked_games = []
+        open_games = []
         for g in weekly_games:
-            # Extract teams from game string
-            if "@" in g["game"]:
-                away_team, home_team = g["game"].split(" @ ")
-            else:
-                home_team, away_team = g["game"].split(" vs. ")
-            
-            # Get full names first
-            away_full = TEAM_NAME_MAPPING.get(away_team, away_team)
-            home_full = TEAM_NAME_MAPPING.get(home_team, home_team)
-            
-            # Convert to display names for UI
-            away_display = TEAM_DISPLAY_NAMES.get(away_full, away_team)
-            home_display = TEAM_DISPLAY_NAMES.get(home_full, home_team)
-            
-            teams_display = [away_display, home_display]  # For display in selectbox
-            teams_full = [away_full, home_full]  # For storing picks
-            
             commence_time_str = g.get("commence_time", None)
             locked = game_has_started(commence_time_str) if commence_time_str else False
-            prev_pick = user_picks[user_picks["game"] == g["game"]]["pick"].values
-            default_full = prev_pick[0] if len(prev_pick) else teams_full[0]
-            default_display = TEAM_DISPLAY_NAMES.get(default_full, default_full)
-            
-            formatted_game = format_game_with_spread(g["game"], g["spread"])
             if locked:
-                st.write(f"**{formatted_game}** — 🔒 Game Locked")
+                locked_games.append(g)
+            else:
+                open_games.append(g)
+
+        # Locked games section
+        if locked_games:
+            st.subheader("🔒 Locked Games")
+            st.write("---")
+            for g in locked_games:
+                formatted_game = format_game_with_spread(g["game"], g["spread"])
+                st.markdown(f"**{formatted_game}**")
+                prev_pick = user_picks[user_picks["game"] == g["game"]]["pick"].values
+                away_team, home_team = g["game"].split(" @ ") if "@" in g["game"] else g["game"].split(" vs. ")
+                away_full = TEAM_NAME_MAPPING.get(away_team, away_team)
+                home_full = TEAM_NAME_MAPPING.get(home_team, home_team)
                 if len(prev_pick):
-                    # Find the user's locked-in spread for this pick
                     pick_row = user_picks[user_picks["game"] == g["game"]].iloc[0]
                     pick_team = pick_row["pick"]
                     pick_spread = pick_row["spread"]
@@ -403,74 +397,92 @@ def render_make_picks_tab(user, picks_df, weekly_games):
                         st.write(f"Your Pick: {pick_display}")
                 else:
                     st.write("No pick submitted.")
-            else:
-                st.write(formatted_game)
-                selected_display = st.selectbox(
-                    "Make your pick:",
-                    teams_display,
-                    index=teams_display.index(default_display) if default_display in teams_display else 0,
-                    key=f"{g['game']}_{user}"
-                )
-                # Convert display name back to full name for storage
-                selected_full = teams_full[teams_display.index(selected_display)]
-                session_picks.append({
-                    "week": current_week,
-                    "user": user,
-                    "game": g["game"],
-                    "spread": g["spread"],
-                    "pick": selected_full,
-                    "timestamp": datetime.now().isoformat(timespec="seconds")
-                })
-        
-        # Add Submit/Reset buttons
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("Submit Picks"):
-                # Keep existing picks for games that are locked/concluded (not in weekly_games)
-                locked_games = picks_df[
-                    (picks_df["week"] == current_week) &
-                    (picks_df["user"] == user) &
-                    (~picks_df["game"].isin([g["game"] for g in weekly_games]))
-                ]
-                new_picks_df = pd.concat([
-                    picks_df[~((picks_df["week"] == current_week) & (picks_df["user"] == user))],
-                    pd.DataFrame(session_picks),
-                    locked_games
-                ], ignore_index=True)
-                save_picks(new_picks_df)
-                st.success("✅ Picks submitted successfully!")
-                st.rerun()
-        
-        with col2:
-            if not st.session_state.show_reset_confirm:
-                if st.button("Reset Picks"):
-                    st.session_state.show_reset_confirm = True
-                    st.rerun()
-            else:
-                if st.button("Confirm Reset"):
-                    new_picks_df = picks_df[~((picks_df["week"] == current_week) & (picks_df["user"] == user))]
-                    save_picks(new_picks_df)
-                    st.session_state.show_reset_confirm = False
-                    st.success("🔄 Picks reset successfully!")
-                    st.rerun()
-                if st.button("Cancel"):
-                    st.session_state.show_reset_confirm = False
-                    st.rerun()
+                st.divider()
+
+        # Open games section (in a form)
+        if open_games:
+            st.subheader("🟢 Open Games")
+            with st.form("make_picks_form"):
+                for g in open_games:
+                    formatted_game = format_game_with_spread(g["game"], g["spread"])
+                    away_team, home_team = g["game"].split(" @ ") if "@" in g["game"] else g["game"].split(" vs. ")
+                    away_full = TEAM_NAME_MAPPING.get(away_team, away_team)
+                    home_full = TEAM_NAME_MAPPING.get(home_team, home_team)
+                    away_display = TEAM_DISPLAY_NAMES.get(away_full, away_team)
+                    home_display = TEAM_DISPLAY_NAMES.get(home_full, home_team)
+                    teams_display = [away_display, home_display]
+                    teams_full = [away_full, home_full]
+                    prev_pick = user_picks[user_picks["game"] == g["game"]]["pick"].values
+                    default_full = prev_pick[0] if len(prev_pick) else teams_full[0]
+                    default_display = TEAM_DISPLAY_NAMES.get(default_full, default_full)
+
+                    st.markdown(f"**{formatted_game}**")
+                    col1, col2 = st.columns([2, 1])
+                    with col1:
+                        selected_display = st.selectbox(
+                            "Make your pick:",
+                            teams_display,
+                            index=teams_display.index(default_display) if default_display in teams_display else 0,
+                            key=f"{g['game']}_{user}"
+                        )
+                    with col2:
+                        st.write("")  # For spacing/alignment
+
+                    selected_full = teams_full[teams_display.index(selected_display)]
+                    session_picks.append({
+                        "week": current_week,
+                        "user": user,
+                        "game": g["game"],
+                        "spread": g["spread"],
+                        "pick": selected_full,
+                        "timestamp": datetime.now().isoformat(timespec="seconds")
+                    })
+                    st.divider()
+
+                # Submit/Reset buttons at the bottom of the form
+                col1, col2 = st.columns(2)
+                with col1:
+                    if st.form_submit_button("Submit Picks"):
+                        locked_games_df = picks_df[
+                            (picks_df["week"] == current_week) &
+                            (picks_df["user"] == user) &
+                            (~picks_df["game"].isin([g["game"] for g in weekly_games]))
+                        ]
+                        new_picks_df = pd.concat([
+                            picks_df[~((picks_df["week"] == current_week) & (picks_df["user"] == user))],
+                            pd.DataFrame(session_picks),
+                            locked_games_df
+                        ], ignore_index=True)
+                        save_picks(new_picks_df)
+                        st.success("✅ Picks submitted successfully!")
+                        st.rerun()
+                with col2:
+                    if not st.session_state.show_reset_confirm:
+                        if st.form_submit_button("Reset Picks"):
+                            st.session_state.show_reset_confirm = True
+                            st.rerun()
+                    else:
+                        if st.form_submit_button("Confirm Reset"):
+                            new_picks_df = picks_df[~((picks_df["week"] == current_week) & (picks_df["user"] == user))]
+                            save_picks(new_picks_df)
+                            st.session_state.show_reset_confirm = False
+                            st.success("🔄 Picks reset successfully!")
+                            st.rerun()
+                        if st.form_submit_button("Cancel"):
+                            st.session_state.show_reset_confirm = False
+                            st.rerun()
 
     st.subheader("Your Picks This Week")
     current_picks = picks_df[(picks_df["user"] == user) & (picks_df["week"] == current_week)]
     if not current_picks.empty:
-        # Create display DataFrame with formatted games
         current_picks_display = current_picks.copy()
         current_picks_display["formatted_game"] = current_picks_display.apply(
             lambda row: format_game_with_spread(row["game"], row["spread"]), 
             axis=1
         )
-        # Convert pick to display name
         current_picks_display["pick"] = current_picks_display["pick"].apply(
             lambda x: TEAM_DISPLAY_NAMES.get(x, x)
         )
-        
         st.table(
             current_picks_display[["formatted_game", "pick"]].rename(columns={
                 "formatted_game": "Game",
