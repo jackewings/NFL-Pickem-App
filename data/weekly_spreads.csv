@@ -16,34 +16,34 @@ week,home_team,away_team,commence_time,spread,bookmaker,game,last_updated
 1,Buffalo Bills,Baltimore Ravens,,,DraftKings,Baltimore Ravens @ Buffalo Bills,2025-09-11T13:00:00
 1,Chicago Bears,Minnesota Vikings,,,DraftKings,Minnesota Vikings @ Chicago Bears,2025-09-11T13:00:00
 2,Green Bay Packers,Washington Commanders,2025-09-12T00:18:00Z,-16.5,DraftKings,Washington Commanders @ Green Bay Packers,2025-09-11T22:06:31.497896-05:00
-2,Detroit Lions,Chicago Bears,2025-09-14T17:00:00Z,-6.5,DraftKings,Chicago Bears @ Detroit Lions,2025-09-13T12:33:54.867184-05:00
-2,Cincinnati Bengals,Jacksonville Jaguars,2025-09-14T17:00:00Z,-3.5,DraftKings,Jacksonville Jaguars @ Cincinnati Bengals,2025-09-13T12:33:54.867237-05:00
-2,Dallas Cowboys,New York Giants,2025-09-14T17:00:00Z,-4.5,DraftKings,New York Giants @ Dallas Cowboys,2025-09-13T12:33:54.867257-05:00
-2,Miami Dolphins,New England Patriots,2025-09-14T17:00:00Z,-1.5,DraftKings,New England Patriots @ Miami Dolphins,2025-09-13T12:33:54.867274-05:00
-2,Baltimore Ravens,Cleveland Browns,2025-09-14T17:01:00Z,-11.5,DraftKings,Cleveland Browns @ Baltimore Ravens,2025-09-13T12:33:54.867295-05:00
-2,New York Jets,Buffalo Bills,2025-09-14T17:01:00Z,6.5,DraftKings,Buffalo Bills @ New York Jets,2025-09-13T12:33:54.867317-05:00
-2,Tennessee Titans,Los Angeles Rams,2025-09-14T17:01:00Z,5.5,DraftKings,Los Angeles Rams @ Tennessee Titans,2025-09-13T12:33:54.867334-05:00
-2,New Orleans Saints,San Francisco 49ers,2025-09-14T17:01:00Z,3.0,DraftKings,San Francisco 49ers @ New Orleans Saints,2025-09-13T12:33:54.867349-05:00
-2,Pittsburgh Steelers,Seattle Seahawks,2025-09-14T17:01:00Z,-3.0,DraftKings,Seattle Seahawks @ Pittsburgh Steelers,2025-09-13T12:33:54.867364-05:00
-2,Arizona Cardinals,Carolina Panthers,2025-09-14T20:05:00Z,-6.5,DraftKings,Carolina Panthers @ Arizona Cardinals,2025-09-13T12:33:54.867379-05:00
-2,Indianapolis Colts,Denver Broncos,2025-09-14T20:06:00Z,2.5,DraftKings,Denver Broncos @ Indianapolis Colts,2025-09-13T12:33:54.867394-05:00
-2,Kansas City Chiefs,Philadelphia Eagles,2025-09-14T20:25:00Z,1.5,DraftKings,Philadelphia Eagles @ Kansas City Chiefs,2025-09-13T12:33:54.867409-05:00
-2,Minnesota Vikings,Atlanta Falcons,2025-09-15T00:20:00Z,-3.5,DraftKings,Atlanta Falcons @ Minnesota Vikings,2025-09-13T12:33:54.867424-05:00
-2,Houston Texans,Tampa Bay Buccaneers,2025-09-15T23:01:00Z,-2.5,DraftKings,Tampa Bay Buccaneers @ Houston Texans,2025-09-13T12:33:54.867438-05:00
-2,Las Vegas Raiders,Los Angeles Chargers,2025-09-16T02:00:00Z,3.5,DraftKings,Los Angeles Chargers @ Las Vegas Raiders,2025-09-13T12:33:54.867452-05:00
-3,Buffalo Bills,Miami Dolphins,2025-09-18T23:16:00Z,-10.5,DraftKings,Miami Dolphins @ Buffalo Bills,2025-09-13T12:33:54.867470-05:00
-3,Carolina Panthers,Atlanta Falcons,2025-09-21T16:01:00Z,2.5,DraftKings,Atlanta Falcons @ Carolina Panthers,2025-09-13T12:33:54.867485-05:00
-3,Minnesota Vikings,Cincinnati Bengals,2025-09-21T16:01:00Z,-1.5,DraftKings,Cincinnati Bengals @ Minnesota Vikings,2025-09-13T12:33:54.867500-05:00
-3,Jacksonville Jaguars,Houston Texans,2025-09-21T16:01:00Z,1.5,DraftKings,Houston Texans @ Jacksonville Jaguars,2025-09-13T12:33:54.867515-05:00
-3,Tennessee Titans,Indianapolis Colts,2025-09-21T16:01:00Z,2.5,DraftKings,Indianapolis Colts @ Tennessee Titans,2025-09-13T12:33:54.867530-05:00
-3,Philadelphia Eagles,Los Angeles Rams,2025-09-21T16:01:00Z,-4.5,DraftKings,Los Angeles Rams @ Philadelphia Eagles,2025-09-13T12:33:54.867545-05:00
-3,New England Patriots,Pittsburgh Steelers,2025-09-21T16:01:00Z,1.5,DraftKings,Pittsburgh Steelers @ New England Patriots,2025-09-13T12:33:54.867559-05:00
-3,Tampa Bay Buccaneers,New York Jets,2025-09-21T16:01:00Z,-5.5,DraftKings,New York Jets @ Tampa Bay Buccaneers,2025-09-13T12:33:54.867574-05:00
-3,Cleveland Browns,Green Bay Packers,2025-09-21T17:00:00Z,7.5,DraftKings,Green Bay Packers @ Cleveland Browns,2025-09-13T12:33:54.867589-05:00
-3,Washington Commanders,Las Vegas Raiders,2025-09-21T17:00:00Z,-6.5,DraftKings,Las Vegas Raiders @ Washington Commanders,2025-09-13T12:33:54.867603-05:00
-3,Los Angeles Chargers,Denver Broncos,2025-09-21T19:06:00Z,-1.5,DraftKings,Denver Broncos @ Los Angeles Chargers,2025-09-13T12:33:54.867618-05:00
-3,Seattle Seahawks,New Orleans Saints,2025-09-21T19:06:00Z,-7.0,DraftKings,New Orleans Saints @ Seattle Seahawks,2025-09-13T12:33:54.867635-05:00
-3,Chicago Bears,Dallas Cowboys,2025-09-21T19:26:00Z,-2.5,DraftKings,Dallas Cowboys @ Chicago Bears,2025-09-13T12:33:54.867694-05:00
-3,San Francisco 49ers,Arizona Cardinals,2025-09-21T20:25:00Z,-1.5,DraftKings,Arizona Cardinals @ San Francisco 49ers,2025-09-13T12:33:54.867717-05:00
-3,New York Giants,Kansas City Chiefs,2025-09-21T23:21:00Z,6.0,DraftKings,Kansas City Chiefs @ New York Giants,2025-09-13T12:33:54.867733-05:00
-3,Baltimore Ravens,Detroit Lions,2025-09-22T23:16:00Z,-6.0,DraftKings,Detroit Lions @ Baltimore Ravens,2025-09-13T12:33:54.867749-05:00
+2,Detroit Lions,Chicago Bears,2025-09-14T17:00:00Z,-6.5,DraftKings,Chicago Bears @ Detroit Lions,2025-09-13T18:34:27.120213-05:00
+2,Cincinnati Bengals,Jacksonville Jaguars,2025-09-14T17:00:00Z,-3.5,DraftKings,Jacksonville Jaguars @ Cincinnati Bengals,2025-09-13T18:34:27.120267-05:00
+2,Dallas Cowboys,New York Giants,2025-09-14T17:00:00Z,-4.5,DraftKings,New York Giants @ Dallas Cowboys,2025-09-13T18:34:27.120288-05:00
+2,Miami Dolphins,New England Patriots,2025-09-14T17:00:00Z,-1.5,DraftKings,New England Patriots @ Miami Dolphins,2025-09-13T18:34:27.120304-05:00
+2,Baltimore Ravens,Cleveland Browns,2025-09-14T17:01:00Z,-11.5,DraftKings,Cleveland Browns @ Baltimore Ravens,2025-09-13T18:34:27.120321-05:00
+2,New York Jets,Buffalo Bills,2025-09-14T17:01:00Z,6.5,DraftKings,Buffalo Bills @ New York Jets,2025-09-13T18:34:27.120336-05:00
+2,Tennessee Titans,Los Angeles Rams,2025-09-14T17:01:00Z,5.5,DraftKings,Los Angeles Rams @ Tennessee Titans,2025-09-13T18:34:27.120351-05:00
+2,New Orleans Saints,San Francisco 49ers,2025-09-14T17:01:00Z,3.0,DraftKings,San Francisco 49ers @ New Orleans Saints,2025-09-13T18:34:27.120365-05:00
+2,Pittsburgh Steelers,Seattle Seahawks,2025-09-14T17:01:00Z,-3.0,DraftKings,Seattle Seahawks @ Pittsburgh Steelers,2025-09-13T18:34:27.120379-05:00
+2,Arizona Cardinals,Carolina Panthers,2025-09-14T20:05:00Z,-6.5,DraftKings,Carolina Panthers @ Arizona Cardinals,2025-09-13T18:34:27.120395-05:00
+2,Indianapolis Colts,Denver Broncos,2025-09-14T20:06:00Z,2.5,DraftKings,Denver Broncos @ Indianapolis Colts,2025-09-13T18:34:27.120410-05:00
+2,Kansas City Chiefs,Philadelphia Eagles,2025-09-14T20:25:00Z,1.5,DraftKings,Philadelphia Eagles @ Kansas City Chiefs,2025-09-13T18:34:27.120424-05:00
+2,Minnesota Vikings,Atlanta Falcons,2025-09-15T00:20:00Z,-3.5,DraftKings,Atlanta Falcons @ Minnesota Vikings,2025-09-13T18:34:27.120437-05:00
+2,Houston Texans,Tampa Bay Buccaneers,2025-09-15T23:01:00Z,-2.5,DraftKings,Tampa Bay Buccaneers @ Houston Texans,2025-09-13T18:34:27.120451-05:00
+2,Las Vegas Raiders,Los Angeles Chargers,2025-09-16T02:00:00Z,3.5,DraftKings,Los Angeles Chargers @ Las Vegas Raiders,2025-09-13T18:34:27.120464-05:00
+3,Buffalo Bills,Miami Dolphins,2025-09-18T23:16:00Z,-10.5,DraftKings,Miami Dolphins @ Buffalo Bills,2025-09-13T18:34:27.120480-05:00
+3,Carolina Panthers,Atlanta Falcons,2025-09-21T16:01:00Z,2.5,DraftKings,Atlanta Falcons @ Carolina Panthers,2025-09-13T18:34:27.120495-05:00
+3,Minnesota Vikings,Cincinnati Bengals,2025-09-21T16:01:00Z,-1.5,DraftKings,Cincinnati Bengals @ Minnesota Vikings,2025-09-13T18:34:27.120509-05:00
+3,Jacksonville Jaguars,Houston Texans,2025-09-21T16:01:00Z,1.5,DraftKings,Houston Texans @ Jacksonville Jaguars,2025-09-13T18:34:27.120523-05:00
+3,Tennessee Titans,Indianapolis Colts,2025-09-21T16:01:00Z,2.5,DraftKings,Indianapolis Colts @ Tennessee Titans,2025-09-13T18:34:27.120537-05:00
+3,Philadelphia Eagles,Los Angeles Rams,2025-09-21T16:01:00Z,-4.5,DraftKings,Los Angeles Rams @ Philadelphia Eagles,2025-09-13T18:34:27.120574-05:00
+3,New England Patriots,Pittsburgh Steelers,2025-09-21T16:01:00Z,1.5,DraftKings,Pittsburgh Steelers @ New England Patriots,2025-09-13T18:34:27.120589-05:00
+3,Tampa Bay Buccaneers,New York Jets,2025-09-21T16:01:00Z,-5.5,DraftKings,New York Jets @ Tampa Bay Buccaneers,2025-09-13T18:34:27.120604-05:00
+3,Cleveland Browns,Green Bay Packers,2025-09-21T17:00:00Z,7.5,DraftKings,Green Bay Packers @ Cleveland Browns,2025-09-13T18:34:27.120618-05:00
+3,Washington Commanders,Las Vegas Raiders,2025-09-21T17:00:00Z,-6.5,DraftKings,Las Vegas Raiders @ Washington Commanders,2025-09-13T18:34:27.120632-05:00
+3,Los Angeles Chargers,Denver Broncos,2025-09-21T19:06:00Z,-1.5,DraftKings,Denver Broncos @ Los Angeles Chargers,2025-09-13T18:34:27.120647-05:00
+3,Seattle Seahawks,New Orleans Saints,2025-09-21T19:06:00Z,-7.0,DraftKings,New Orleans Saints @ Seattle Seahawks,2025-09-13T18:34:27.120668-05:00
+3,Chicago Bears,Dallas Cowboys,2025-09-21T19:26:00Z,-2.5,DraftKings,Dallas Cowboys @ Chicago Bears,2025-09-13T18:34:27.120683-05:00
+3,San Francisco 49ers,Arizona Cardinals,2025-09-21T20:25:00Z,-1.5,DraftKings,Arizona Cardinals @ San Francisco 49ers,2025-09-13T18:34:27.120700-05:00
+3,New York Giants,Kansas City Chiefs,2025-09-21T23:21:00Z,6.0,DraftKings,Kansas City Chiefs @ New York Giants,2025-09-13T18:34:27.120715-05:00
+3,Baltimore Ravens,Detroit Lions,2025-09-22T23:16:00Z,-6.0,DraftKings,Detroit Lions @ Baltimore Ravens,2025-09-13T18:34:27.120730-05:00
