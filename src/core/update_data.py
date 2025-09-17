@@ -35,12 +35,12 @@ def update_spreads_and_results():
             logger.warning("No spreads data received from API")
         
         # Update results for the current week
-        results = nfl_data.get_game_results(CURRENT_WEEK)
-        if results:
-            logger.info(f"Successfully updated results for week {CURRENT_WEEK}")
-        else:
-            logger.info(f"No results found for week {CURRENT_WEEK}")
-        return True
+        #results = nfl_data.get_game_results(CURRENT_WEEK)
+        #if results:
+            #logger.info(f"Successfully updated results for week {CURRENT_WEEK}")
+        #else:
+            #logger.info(f"No results found for week {CURRENT_WEEK}")
+        #return True
     except Exception as e:
         logger.error(f"Error updating data: {str(e)}")
         return False
