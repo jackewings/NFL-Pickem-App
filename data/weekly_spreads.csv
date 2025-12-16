@@ -223,19 +223,19 @@ week,home_team,away_team,commence_time,spread,bookmaker,game,last_updated
 15,San Francisco 49ers,Tennessee Titans,2025-12-14T21:25:47Z,-24.5,DraftKings,Tennessee Titans @ San Francisco 49ers,2025-12-14T17:41:43.205952-06:00
 15,Dallas Cowboys,Minnesota Vikings,2025-12-15T01:22:59Z,7.5,DraftKings,Minnesota Vikings @ Dallas Cowboys,2025-12-14T22:15:14.062819-06:00
 15,Pittsburgh Steelers,Miami Dolphins,2025-12-16T01:15:33Z,-19.5,DraftKings,Miami Dolphins @ Pittsburgh Steelers,2025-12-15T21:45:25.277923-06:00
-16,Seattle Seahawks,Los Angeles Rams,2025-12-19T01:15:00Z,-1.5,DraftKings,Los Angeles Rams @ Seattle Seahawks,2025-12-16T05:39:06.867465-06:00
-16,Washington Commanders,Philadelphia Eagles,2025-12-20T22:00:00Z,6.5,DraftKings,Philadelphia Eagles @ Washington Commanders,2025-12-16T05:39:06.867525-06:00
-16,Chicago Bears,Green Bay Packers,2025-12-21T01:20:00Z,1.5,DraftKings,Green Bay Packers @ Chicago Bears,2025-12-16T05:39:06.867550-06:00
-16,Cleveland Browns,Buffalo Bills,2025-12-21T18:00:00Z,10.0,DraftKings,Buffalo Bills @ Cleveland Browns,2025-12-16T05:39:06.867572-06:00
-16,Carolina Panthers,Tampa Bay Buccaneers,2025-12-21T18:00:00Z,3.0,DraftKings,Tampa Bay Buccaneers @ Carolina Panthers,2025-12-16T05:39:06.867593-06:00
-16,Miami Dolphins,Cincinnati Bengals,2025-12-21T18:00:00Z,1.5,DraftKings,Cincinnati Bengals @ Miami Dolphins,2025-12-16T05:39:06.867614-06:00
-16,Dallas Cowboys,Los Angeles Chargers,2025-12-21T18:00:00Z,-1.5,DraftKings,Los Angeles Chargers @ Dallas Cowboys,2025-12-16T05:39:06.867633-06:00
-16,Tennessee Titans,Kansas City Chiefs,2025-12-21T18:00:00Z,3.5,DraftKings,Kansas City Chiefs @ Tennessee Titans,2025-12-16T05:39:06.867652-06:00
-16,New York Giants,Minnesota Vikings,2025-12-21T18:00:00Z,3.0,DraftKings,Minnesota Vikings @ New York Giants,2025-12-16T05:39:06.867671-06:00
-16,New Orleans Saints,New York Jets,2025-12-21T18:00:00Z,-4.5,DraftKings,New York Jets @ New Orleans Saints,2025-12-16T05:39:06.867691-06:00
-16,Arizona Cardinals,Atlanta Falcons,2025-12-21T21:05:00Z,2.5,DraftKings,Atlanta Falcons @ Arizona Cardinals,2025-12-16T05:39:06.867710-06:00
-16,Denver Broncos,Jacksonville Jaguars,2025-12-21T21:05:00Z,-3.0,DraftKings,Jacksonville Jaguars @ Denver Broncos,2025-12-16T05:39:06.867733-06:00
-16,Detroit Lions,Pittsburgh Steelers,2025-12-21T21:25:00Z,-7.0,DraftKings,Pittsburgh Steelers @ Detroit Lions,2025-12-16T05:39:06.867753-06:00
-16,Houston Texans,Las Vegas Raiders,2025-12-21T21:25:00Z,-14.5,DraftKings,Las Vegas Raiders @ Houston Texans,2025-12-16T05:39:06.867772-06:00
-16,Baltimore Ravens,New England Patriots,2025-12-22T01:20:00Z,-3.0,DraftKings,New England Patriots @ Baltimore Ravens,2025-12-16T05:39:06.867791-06:00
-16,Indianapolis Colts,San Francisco 49ers,2025-12-23T01:15:00Z,5.5,DraftKings,San Francisco 49ers @ Indianapolis Colts,2025-12-16T05:39:06.867812-06:00
+16,Seattle Seahawks,Los Angeles Rams,2025-12-19T01:15:00Z,1.5,DraftKings,Los Angeles Rams @ Seattle Seahawks,2025-12-16T11:45:30.981066-06:00
+16,Washington Commanders,Philadelphia Eagles,2025-12-20T22:00:00Z,6.5,DraftKings,Philadelphia Eagles @ Washington Commanders,2025-12-16T11:45:30.981124-06:00
+16,Chicago Bears,Green Bay Packers,2025-12-21T01:20:00Z,1.5,DraftKings,Green Bay Packers @ Chicago Bears,2025-12-16T11:45:30.981149-06:00
+16,Cleveland Browns,Buffalo Bills,2025-12-21T18:00:00Z,10.0,DraftKings,Buffalo Bills @ Cleveland Browns,2025-12-16T11:45:30.981172-06:00
+16,Carolina Panthers,Tampa Bay Buccaneers,2025-12-21T18:00:00Z,3.0,DraftKings,Tampa Bay Buccaneers @ Carolina Panthers,2025-12-16T11:45:30.981192-06:00
+16,Miami Dolphins,Cincinnati Bengals,2025-12-21T18:00:00Z,1.5,DraftKings,Cincinnati Bengals @ Miami Dolphins,2025-12-16T11:45:30.981212-06:00
+16,Dallas Cowboys,Los Angeles Chargers,2025-12-21T18:00:00Z,-1.5,DraftKings,Los Angeles Chargers @ Dallas Cowboys,2025-12-16T11:45:30.981231-06:00
+16,Tennessee Titans,Kansas City Chiefs,2025-12-21T18:00:00Z,3.5,DraftKings,Kansas City Chiefs @ Tennessee Titans,2025-12-16T11:45:30.981250-06:00
+16,New York Giants,Minnesota Vikings,2025-12-21T18:00:00Z,3.0,DraftKings,Minnesota Vikings @ New York Giants,2025-12-16T11:45:30.981269-06:00
+16,New Orleans Saints,New York Jets,2025-12-21T18:00:00Z,-4.5,DraftKings,New York Jets @ New Orleans Saints,2025-12-16T11:45:30.981288-06:00
+16,Arizona Cardinals,Atlanta Falcons,2025-12-21T21:05:00Z,2.5,DraftKings,Atlanta Falcons @ Arizona Cardinals,2025-12-16T11:45:30.981307-06:00
+16,Denver Broncos,Jacksonville Jaguars,2025-12-21T21:05:00Z,-3.0,DraftKings,Jacksonville Jaguars @ Denver Broncos,2025-12-16T11:45:30.981331-06:00
+16,Detroit Lions,Pittsburgh Steelers,2025-12-21T21:25:00Z,-7.0,DraftKings,Pittsburgh Steelers @ Detroit Lions,2025-12-16T11:45:30.981350-06:00
+16,Houston Texans,Las Vegas Raiders,2025-12-21T21:25:00Z,-14.5,DraftKings,Las Vegas Raiders @ Houston Texans,2025-12-16T11:45:30.981368-06:00
+16,Baltimore Ravens,New England Patriots,2025-12-22T01:20:00Z,-3.0,DraftKings,New England Patriots @ Baltimore Ravens,2025-12-16T11:45:30.981387-06:00
+16,Indianapolis Colts,San Francisco 49ers,2025-12-23T01:15:00Z,6.5,DraftKings,San Francisco 49ers @ Indianapolis Colts,2025-12-16T11:45:30.981409-06:00
