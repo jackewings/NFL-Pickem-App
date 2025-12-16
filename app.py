@@ -897,14 +897,22 @@ def render_leaderboards_tab(picks_df):
         selected_week = st.selectbox("Select Week:", week_options, key="leaderboard_week")
 
         # Filter by selected week
+        week_picks = completed_picks[completed_picks["week"] == selected_week]
+
+        # Only count non-pushes for correct pick %
+        non_push_week_picks = week_picks[week_picks["result"] != "push"]
         weekly = (
-            completed_picks[completed_picks["week"] == selected_week]
-            .groupby(["week", "user"])["result"]
+            non_push_week_picks.groupby(["week", "user"])["result"]
             .apply(lambda x: (x == "correct").sum())
             .reset_index(name="correct")
         )
-        weekly["total"] = completed_picks[completed_picks["week"] == selected_week].groupby(["week", "user"])["result"].count().values
+        weekly["total"] = non_push_week_picks.groupby(["week", "user"])["result"].count().values
         weekly["correct_pct"] = weekly["correct"] / weekly["total"] * 100
+
+        # Add Pushes column
+        push_counts = week_picks[week_picks["result"] == "push"].groupby("user").size().to_dict()
+        weekly["Pushes"] = weekly["user"].map(lambda u: push_counts.get(u, 0))
+
         weekly = add_rank(weekly, ["correct", "correct_pct"])
         weekly["correct_pct"] = weekly["correct_pct"].apply(lambda x: f"{x:.1f}%")
         st.dataframe(
@@ -913,8 +921,9 @@ def render_leaderboards_tab(picks_df):
                 "week": "Week",
                 "correct": "Correct Picks",
                 "correct_pct": "Correct Pick %",
-                "Rank": "Rank"
-            })[["Rank", "User", "Week", "Correct Picks", "Correct Pick %"]],
+                "Rank": "Rank",
+                "Pushes": "Pushes"
+            })[["Rank", "User", "Week", "Correct Picks", "Correct Pick %", "Pushes"]],
             use_container_width=True,
             hide_index=True
         )
@@ -940,8 +949,9 @@ def render_leaderboards_tab(picks_df):
             .to_dict()
         )
 
+        non_push_picks = completed_picks[completed_picks["result"] != "push"]
         total = (
-            completed_picks.groupby("user")["is_correct"]
+            non_push_picks.groupby("user")["is_correct"]
             .agg(correct="sum", total="count")
             .reset_index()
         )
@@ -949,14 +959,20 @@ def render_leaderboards_tab(picks_df):
         total = add_rank(total, ["correct", "correct_pct"])
         total["correct_pct"] = total["correct_pct"].apply(lambda x: f"{x:.1f}%")
         total["Best Team"] = total["user"].map(lambda u: TEAM_DISPLAY_NAMES.get(best_team.get(u, ""), best_team.get(u, "")))
+
+        # Add Pushes column
+        push_counts = completed_picks[completed_picks["result"] == "push"].groupby("user").size().to_dict()
+        total["Pushes"] = total["user"].map(lambda u: push_counts.get(u, 0))
+
         st.dataframe(
             total.rename(columns={
                 "user": "User",
                 "correct": "Correct Picks",
                 "correct_pct": "Correct Pick %",
                 "Rank": "Rank",
-                "Best Team": "Best Team"
-            })[["Rank", "User", "Correct Picks", "Correct Pick %", "Best Team"]],
+                "Best Team": "Best Team",
+                "Pushes": "Pushes"
+            })[["Rank", "User", "Correct Picks", "Correct Pick %", "Pushes", "Best Team"]],
             use_container_width=True,
             hide_index=True
         )
