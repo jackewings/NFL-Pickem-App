@@ -979,6 +979,24 @@ def render_leaderboards_tab(picks_df):
     else:
         st.info("No results available yet.")
 
+def render_punishment_reward_tab():
+    st.header("🏆 Punishment & Reward")
+    st.markdown("""
+**End-of-Season Golf & Bar Challenge**
+
+After the NFL season, all four players will go out and play 9 holes of golf together.
+
+- **Punishment:**  
+  - The player with the lowest season win percentage ("the loser") must drink **9 drinks in 9 holes**.
+  - For every **3 strokes over par** the loser shoots, they must buy a round for the other 3 members.
+
+- **Reward:**  
+  - After golf, everyone will go to a bar.
+  - The **season winner** (best win percentage) gets their entire bill (all food and drinks from the bar and during golf) **paid for by the other 3 players** (split evenly).
+
+**Good luck! 🍻⛳**
+""")
+
 def main():
     st.title("🏈 NFL Pick'em Tracker")
     st.caption("For entertainment purposes only. Tracks friendly picks, does not involve betting or money.")
@@ -1026,7 +1044,10 @@ def render_live_mode():
 
     # Only shown after successful authentication
     user = st.session_state.user
-    tabs = st.tabs(["Make Picks", "Past Picks", "Group Picks", "Group Data", "Leaderboards", "Update Results"])
+    tabs = st.tabs([
+        "Make Picks", "Past Picks", "Group Picks", "Group Data", 
+        "Leaderboards", "Update Results", "Punishment & Reward"
+    ])
     picks_df = load_picks()
 
     # Render each tab
@@ -1047,6 +1068,8 @@ def render_live_mode():
         render_leaderboards_tab(picks_df)
     with tabs[5]:
         render_update_results_tab()
+    with tabs[6]:
+        render_punishment_reward_tab()
 
 def render_demo_mode():
     """Render the demo mode content"""
