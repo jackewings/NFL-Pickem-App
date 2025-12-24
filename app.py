@@ -992,7 +992,7 @@ After the NFL season, all four players will go out and play 9 holes of golf toge
 
 - **Reward:**  
   - After golf, everyone will go to a bar.
-  - The **season winner** (best win percentage) gets their entire bill (all food and drinks from the bar and during golf) **paid for by the other 3 players** (split evenly).
+  - The **season winner** (best win percentage) gets their entire bill (all food, drinks, and greens fees from the bar and during golf) **paid for by the other 3 players** (split evenly).
 
 **Good luck! 🍻⛳**
 """)
