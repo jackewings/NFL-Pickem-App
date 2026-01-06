@@ -168,7 +168,7 @@ def get_current_week():
     if now < first_tuesday_noon:
         return 1
     week_delta = ((now - first_tuesday_noon).days // 7) + 2  # +2 because week 1 is before first Tuesday
-    return min(week_delta, 18)
+    return min(week_delta, 22)
 
 CURRENT_WEEK = get_current_week()
 
